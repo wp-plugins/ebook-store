@@ -1,13 +1,13 @@
 === Ebook Store  ===
 Contributors: motov.net
-Tags: comments, spam
+Tags: paypal, wordpress, file seller, sell, files, ebook, ebooks, paid, downloads, qr, code, watermark, ecnrypt, pdf, mobi
 Requires at least: 3.5.1
 Tested up to: 3.8
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin will allow you to sell ebooks in various formats like PDF, mobi and etc. It's can also encrypt and watermark the sold ebooks.
+This plugin will allow you to sell ebooks in various formats like PDF, mobi and etc. If you upgrade to Pro version, you will also be able to watermark / encrypt pdf files.
 
 == Description ==
 
