@@ -13,14 +13,22 @@ This plugin will allow you to sell ebooks in various formats like PDF, mobi and 
 
 eBook Store Plugin for WordPress has been built by professionals in eCommerce extensions working more than 6 years in providing paid downloads solutions for both Joomla nad WordPress. 
 
+	Are there any limitations?
+The Free version can not encrypt PDF files and put watermarks. For this you need the $20 full version from http://www.shopfiles.com/index.php/products/wordpress-ebook-store
+
+	Is there a demo somewhere?
+Yes there is: http://wp.shopfiles.com/?p=116
+YouTube video: http://www.youtube.com/watch?v=KxSDx4zGLIM
+
 	What does it do? 
-It will let you sell your ebooks in a very stylish and secure way. This is the only extension for WordPress that allows encryption of the sold eBooks, by putting passwords and watermarks / print protection to the PDF files for sale.
+It will let you sell your ebooks in a very stylish and secure way. It's PRO version is the only extension for WordPress that allows encryption of the sold eBooks, by putting passwords and watermarks / print protection to the PDF files for sale.
 
 	How it works?
 Very easy and intuitive! All you need to do is upload a book with it's cover's information and put a price on it. Once you do that you can copy paste the book embed code to place it inside the article. Once you have done that please make sure you have filled in your paypal account where you want to receive the payments.
 
-	Are there any limitations?
-The Free version can not encrypt PDF files and put watermarks. For this you need the $20 full version from http://www.shopfiles.com/index.php/products/wordpress-ebook-store
+	How to contact support?
+Simply by email deian@motov.net and URL: http://www.shopfiles.com
+
 
 That's all you need to do in order to start selling files! :)
 
