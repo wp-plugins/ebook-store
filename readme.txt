@@ -2,7 +2,7 @@
 Contributors: motov.net
 Tags: paypal, wordpress, file seller, sell, files, ebook, ebooks, paid, downloads, qr, code, watermark, ecnrypt, pdf, mobi
 Requires at least: 3.5.1
-Tested up to: 3.8
+Tested up to: 3.8.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -18,6 +18,9 @@ It will let you sell your ebooks in a very stylish and secure way. This is the o
 
 	How it works?
 Very easy and intuitive! All you need to do is upload a book with it's cover's information and put a price on it. Once you do that you can copy paste the book embed code to place it inside the article. Once you have done that please make sure you have filled in your paypal account where you want to receive the payments.
+
+	Are there any limitations?
+The Free version can not encrypt PDF files and put watermarks. For this you need the $20 full version from http://www.shopfiles.com/index.php/products/wordpress-ebook-store
 
 That's all you need to do in order to start selling files! :)
 
@@ -53,4 +56,4 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 * Initial release.
 
 = 2.0 =
-* Added a QR code watermarking feature.
+* Fixed the packege due to svn troubles.
