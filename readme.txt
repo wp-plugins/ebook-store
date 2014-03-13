@@ -1,6 +1,6 @@
 === Ebook Store  ===
 Contributors: motov.net
-Tags: paypal, wordpress, file seller, sell, files, ebook, ebooks, paid, downloads, qr, code, watermark, ecnrypt, pdf, mobi
+Tags: paypal, wordpress, file seller, sell, files, ebook, ebooks, paid, downloads, qr, code, watermark, ecnrypt, pdf, mobi, sell ebooks
 Requires at least: 3.5.1
 Tested up to: 3.8.1
 Stable tag: trunk
@@ -14,7 +14,7 @@ This plugin will allow you to sell ebooks in various formats like PDF, mobi and 
 eBook Store Plugin for WordPress has been built by professionals in eCommerce extensions working more than 6 years in providing paid downloads solutions for both Joomla nad WordPress. 
 
 	Are there any limitations?
-The Free version can not encrypt PDF files and put watermarks. For this you need the $20 full version from http://www.shopfiles.com/index.php/products/wordpress-ebook-store
+The Free version can not encrypt PDF files and put watermarks. For this you need the $20 full version UPGRADE from http://www.shopfiles.com/index.php/products/wordpress-ebook-store
 
 	Is there a demo somewhere?
 Yes there is: http://wp.shopfiles.com/?p=116
