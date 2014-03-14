@@ -10,7 +10,6 @@ function ebook_create_menu() {
 }
 
 if ( is_admin() ){ // admin actions
-	add_action( 'admin_menu', 'add_mymenu' );
 	add_action( 'admin_init', 'register_ebook_store_settings' );
 } else {
 	// non-admin enqueues, actions, and filters
