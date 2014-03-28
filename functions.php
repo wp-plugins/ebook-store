@@ -349,7 +349,7 @@ function save_custom_meta_data($id) {
 	if(!empty($_FILES['ebook_wp_custom_attachment']['name'])) {
 		 
 		// Setup the array of supported file types. In this case, it's just PDF.
-		$supported_types = array('application/pdf','application/x-mobipocket-ebook','application/epub+zip','application/zip');
+		$supported_types = array('application/pdf','application/x-mobipocket-ebook','application/epub+zip','application/zip','application/octet-stream');
 
 		// Get the file type of the upload
 		$arr_file_type = wp_check_filetype(basename($_FILES['ebook_wp_custom_attachment']['name']));
@@ -378,8 +378,8 @@ function save_custom_meta_data($id) {
 	if(!empty($_FILES['ebook_wp_custom_attachment_preview']['name'])) {
 
 		// Setup the array of supported file types. In this case, it's just PDF.
-		$supported_types = array('application/pdf','application/x-mobipocket-ebook');
-
+		$supported_types = array('application/pdf','application/x-mobipocket-ebook','application/epub+zip','application/zip','application/octet-stream');
+		
 		// Get the file type of the upload
 		$arr_file_type = wp_check_filetype(basename($_FILES['ebook_wp_custom_attachment_preview']['name']));
 		$uploaded_type = $arr_file_type['type'];
