@@ -1,6 +1,6 @@
 === Ebook Store  ===
 Contributors: motov.net
-Tags: paypal, epub, paid downloads, sell, files, ebook, ebooks, paid, downloads, qr code, sell ebooks online, watermark, ecnrypt, pdf, mobi, sell ebooks
+Tags: paypal, epub, paid downloads, sell, digital downloads, ebook, ebooks, paid, downloads, qr code, sell ebooks online, watermark, ecnrypt, pdf, mobi, sell ebooks
 Requires at least: 3.5.1
 Tested up to: 3.8.1
 Stable tag: 2.1
