@@ -46,6 +46,7 @@ function register_ebook_store_settings() {
 function ebook_settings_page() {
 	$op = new QSWPOptions();
 $ppcurencies = array('USD' => 'US Dollar',
+'EUR' => 'Euro',
 'ILS' => 'Israeli New Sheqel',
 'GBP' => 'Pounds Sterling',
 'AUD' => 'Australian Dollar',
