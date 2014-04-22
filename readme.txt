@@ -2,7 +2,7 @@
 Contributors: motov.net
 Tags: paypal, epub, paid downloads, sell, digital downloads, ebook, ebooks, paid, downloads, qr code, sell ebooks online, watermark, ecnrypt, pdf, mobi, sell ebooks
 Requires at least: 3.5.1
-Tested up to: 3.8.1
+Tested up to: 3.9
 Stable tag: 2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -52,8 +52,11 @@ The plugin can disable printing, apply watermark with buyer's information on eac
 
 == Screenshots ==
 
-1. The look of the ebook cover, before details view is open.
-2. Look with the details view open, a nice CSS3 3D animation is used for the transition.
+1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
+the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets 
+directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png` 
+(or jpg, jpeg, gif).
+2. This is the second screen shot
 
 == Changelog ==
 
