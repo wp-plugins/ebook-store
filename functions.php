@@ -209,7 +209,12 @@ function save_custom_meta_data_order($id) {
 }
 
 function ebook_code_box() {
-	echo '<input id="ebook_code" onClick="this.select()" readonly type="text" size="30" value=\'[ebook_store ebook_id="' . get_the_ID() . '"]\' />';
+	wp_reset_postdata();
+	$post_id = get_the_ID();
+	if ($_REQUEST['post'] > 0 && $_REQUEST['post'] != $post_id) {
+		$post_id = $_REQUEST['post'];
+	}
+	echo '<input id="ebook_code" onClick="this.select()" readonly type="text" size="30" value=\'[ebook_store ebook_id="' . $post_id . '"]\' />';
 }
 function ebook_wp_custom_attachment() {
 	wp_enqueue_script('jquery-ui-datepicker');
@@ -523,20 +528,25 @@ function ebook_store( $atts ){
 	$cover = get_post_meta(get_the_ID(),'ebook_wp_custom_attachment_cover',true);
 	$side = get_post_meta(get_the_ID(),'ebook_wp_custom_attachment_side_photo',true);
 	//style="background-url:(' . $side['url'] . ');"
-	foreach ($ebook['ebook_publisher'] as $p => $pp) {
-		$publishers[] = get_the_title($pp);
+	if (is_array($ebook['ebook_publisher'])) {
+		$publishers = array();
+		foreach ($ebook['ebook_publisher'] as $p => $pp) {
+			$publishers[] = get_the_title($pp);
+		}		
 	}
-	$publishers = implode(", ", $publishers);
-	foreach ($ebook['ebook_author'] as $p => $pp) {
-		$authors[] = get_the_title($pp);
+	if (is_array($ebook['ebook_author'])) {
+		foreach ($ebook['ebook_author'] as $p => $pp) {
+			$authors[] = get_the_title($pp);
+		}
 	}
-	$authors = implode(", ", $authors);
+	$publishers = @implode(", ", $publishers);
+	$authors = @implode(", ", $authors);
 	/* div class front, where is it?*/
 	$items .= '
             <figure>
                             <div class="perspective"><div class="book" data-book="book-' . get_the_ID() . '"><div class="cover"><div data-dd="dd" class="front" style="background: url(' . $cover['url'] . ');"></div><div class="inner inner-left"></div></div><div class="inner inner-right"></div></div></div><div class="buttons">
                             		<a href="#" style="display:none;">Look inside</a><a href="#">Details</a><a target="_blank" href="' . $preview['url'] . '">Preview</a>
-<a class="ebook_buy_link" href="#" onClick="document.getElementById(\'xxd\').submit(); return false;">Buy (' . $c->getSymbol(get_option('paypal_currency')) . money_format($ebook['ebook_price'],2) . ')</a>
+<a class="ebook_buy_link" href="#" onClick="document.getElementById(\'xxd\').submit(); return false;">Buy (' . $c->getSymbol(get_option('paypal_currency')) . number_format($ebook['ebook_price'],2) . ')</a>
 <form method="post" id="xxd" name="dmp_order_form" action="https://www' . (get_option('paypal_sandbox') != '' ? '.sandbox' : '') . '.paypal.com/cgi-bin/webscr">
 		<input type="hidden" name="rm" value="0">
 		<input type="hidden" name="discount_rate" value="0">

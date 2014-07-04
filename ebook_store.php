@@ -5,7 +5,7 @@ Plugin URI: http://shopfiles.com/
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
 Author URI:http://motov.net/
-Version: 2.2
+Version: 2.3
 License: GPLv2
 */
 include_once('functions.php');

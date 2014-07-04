@@ -3,7 +3,7 @@ Contributors: motov.net
 Tags: paypal, epub, paid downloads, sell, digital downloads, ebook, ebooks, paid, downloads, qr code, sell ebooks online, watermark, ecnrypt, pdf, mobi, sell ebooks
 Requires at least: 3.5.1
 Tested up to: 3.9
-Stable tag: 2.2
+Stable tag: 2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
