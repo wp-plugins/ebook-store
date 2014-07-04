@@ -219,6 +219,7 @@ function ebook_code_box() {
 function ebook_wp_custom_attachment() {
 	wp_enqueue_script('jquery-ui-datepicker');
 	wp_enqueue_style('jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
+	wp_enqueue_script( 'zeroslipboard', plugins_url( '/js/zeroclipboard-1.3.1/ZeroClipboard.js' , __FILE__ ), array(), '1.0.0', true );
 
 	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment', true);
 	$ebook = get_post_meta(get_the_ID(), 'ebook', true);
@@ -270,10 +271,10 @@ function ebook_wp_custom_attachment() {
 <p>Date<br /><input id="ebook_date" name="ebook[ebook_date]" type="text" value="' . @$ebook['ebook_date'] . '"></p>
 <p>Pages<br /><input name="ebook[ebook_pages]" type="number" value="' . @$ebook['ebook_pages'] . '"></p>
 <!--
-<p><input name="ebook[ebook_qrcode]" type="checkbox" value="1" . ' . ($ebook['ebook_qrcode'] != '' ? 'checked' : '') . '>QR Code Watermark <span class="description">(<a href="http://shopfiles.com/samples/protected_cv.pdf" target="_blank">see sample</a>, PDF only)</span></p>
-<p><input name="ebook[ebook_set_password]" type="checkbox" value="1" . ' . ($ebook['ebook_set_password'] != '' ? 'checked' : '') . '>Set password <span class="description">(buyer\'s email, PDF only)</span></p>
-<p><input name="ebook[ebook_disable_printing]" type="checkbox" value="1" . ' . ($ebook['ebook_disable_printing'] != '' ? 'checked' : '') . '>Disable printing <span class="description">(PDF only)</span></p>
-<p><input name="ebook[ebook_emailDelivery]" type="checkbox" value="1" . ' . ($ebook['ebook_emailDelivery'] != '' ? 'checked' : '') . '>Send a copy to buyer\'s email</span></p>
+<p><input name="ebook[ebook_qrcode]" type="checkbox" value="1" . ' . (@$ebook['ebook_qrcode'] != '' ? 'checked' : '') . '>QR Code Watermark <span class="description">(<a href="http://shopfiles.com/samples/protected_cv.pdf" target="_blank">see sample</a>, PDF only)</span></p>
+<p><input name="ebook[ebook_set_password]" type="checkbox" value="1" . ' . (@$ebook['ebook_set_password'] != '' ? 'checked' : '') . '>Set password <span class="description">(buyer\'s email, PDF only)</span></p>
+<p><input name="ebook[ebook_disable_printing]" type="checkbox" value="1" . ' . (@$ebook['ebook_disable_printing'] != '' ? 'checked' : '') . '>Disable printing <span class="description">(PDF only)</span></p>
+<p><input name="ebook[ebook_emailDelivery]" type="checkbox" value="1" . ' . (@$ebook['ebook_emailDelivery'] != '' ? 'checked' : '') . '>Send a copy to buyer\'s email</span></p>
 -->
 <p>Price<br /><input name="ebook[ebook_price]" placeholder="0.00" type="number" step="any" value="' . @$ebook['ebook_price'] . '"></p>
 </form>
@@ -355,7 +356,7 @@ function save_custom_meta_data($id) {
 		 
 		// Setup the array of supported file types. In this case, it's just PDF.
 		$supported_types = array('application/pdf','application/x-mobipocket-ebook','application/epub+zip','application/zip','application/octet-stream');
-
+		
 		// Get the file type of the upload
 		$arr_file_type = wp_check_filetype(basename($_FILES['ebook_wp_custom_attachment']['name']));
 		$uploaded_type = $arr_file_type['type'];
@@ -493,7 +494,7 @@ function humanFileSize($size,$unit="") {
 }
 function ebook_store( $atts ){
 	$post_id = get_the_ID();
-	if ($_REQUEST['ebook_key'] != false && $_REQUEST['action'] == 'thank_you') {
+	if (@$_REQUEST['ebook_key'] != false && @$_REQUEST['action'] == 'thank_you') {
 		$content = get_option('thankyou_page',true);
 		$ebook_order = ebook_get_order('ebook_key', $_REQUEST['ebook_key']);
 		if (!$ebook_order) {
@@ -510,7 +511,7 @@ function ebook_store( $atts ){
 		return apply_filters('the_content',$content);
 	}
 	$items = '';
-	$args = array( 'post_type' => 'ebook', 'posts_per_page' => -1 );
+	$args = array( 'post_type' => 'ebook', 'posts_per_page' => -1, 'p' => $atts['ebook_id'] );
 	$loop = new WP_Query( $args );
 	while ( $loop->have_posts() ) : $loop->the_post();
 	/*the_title();
@@ -520,7 +521,7 @@ function ebook_store( $atts ){
 	$ebook = get_post_meta(get_the_ID(), 'ebook', true);
 	$ebook_key = md5(NONCE_KEY . get_the_ID() . $ebook['ebook_price'] . mt_rand(1,100000));
 	 
-	$custom = get_the_ID() . '|' . md5(NONCE_KEY . get_the_ID() . number_format($ebook['ebook_price'], 2, '.', ','));
+	$custom = get_the_ID() . '|' . md5(NONCE_KEY . get_the_ID() . @number_format($ebook['ebook_price'], 2, '.', ','));
 	 
 	$c = new Currencies();
 	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment', true);
@@ -535,6 +536,7 @@ function ebook_store( $atts ){
 		}		
 	}
 	if (is_array($ebook['ebook_author'])) {
+		$authors = array();
 		foreach ($ebook['ebook_author'] as $p => $pp) {
 			$authors[] = get_the_title($pp);
 		}
@@ -544,9 +546,9 @@ function ebook_store( $atts ){
 	/* div class front, where is it?*/
 	$items .= '
             <figure>
-                            <div class="perspective"><div class="book" data-book="book-' . get_the_ID() . '"><div class="cover"><div data-dd="dd" class="front" style="background: url(' . $cover['url'] . ');"></div><div class="inner inner-left"></div></div><div class="inner inner-right"></div></div></div><div class="buttons">
-                            		<a href="#" style="display:none;">Look inside</a><a href="#">Details</a><a target="_blank" href="' . $preview['url'] . '">Preview</a>
-<a class="ebook_buy_link" href="#" onClick="document.getElementById(\'xxd\').submit(); return false;">Buy (' . $c->getSymbol(get_option('paypal_currency')) . number_format($ebook['ebook_price'],2) . ')</a>
+                            <div class="perspective"><div class="book" data-book="book-' . get_the_ID() . '"><div class="cover"><div data-dd="dd" class="front" style="background: url(' . @$cover['url'] . ');"></div><div class="inner inner-left"></div></div><div class="inner inner-right"></div></div></div><div class="buttons">
+                            		<a href="#" style="display:none;">Look inside</a><a href="#">Details</a><a target="_blank" href="' . @$preview['url'] . '">Preview</a>
+<a class="ebook_buy_link" href="#" onClick="document.getElementById(\'xxd\').submit(); return false;">Buy (' . $c->getSymbol(get_option('paypal_currency','USD')) . @number_format($ebook['ebook_price'],2) . ')</a>
 <form method="post" id="xxd" name="dmp_order_form" action="https://www' . (get_option('paypal_sandbox') != '' ? '.sandbox' : '') . '.paypal.com/cgi-bin/webscr">
 		<input type="hidden" name="rm" value="0">
 		<input type="hidden" name="discount_rate" value="0">
@@ -583,7 +585,7 @@ function ebook_store( $atts ){
             </figure>
             <style>
 .book[data-book="book-' . get_the_ID() . '"] .cover::before {
-background: url(' . $side['url'] . ');
+background: url(' . @$side['url'] . ');
 }
             </style>
             ';
@@ -1199,4 +1201,4 @@ function ebook_encrypt_pdf() {
 	//make sure enc file is attached
 	$ebook_email_delivery['attachment'][0]['file'] = $destfile;
 	$isPdf = true;
-}
+} 
