@@ -1,9 +1,9 @@
 === Ebook Store  ===
 Contributors: motov.net
-Tags: paypal, epub, paid downloads, sell, digital downloads, ebook, ebooks, paid, downloads, qr code, sell ebooks online, watermark, ecnrypt, pdf, mobi, sell ebooks
+Tags: paypal, epub, paid downloads, sell, files, ebook, ebooks, paid, downloads, qr code, sell ebooks online, watermark, ecnrypt, pdf, mobi, sell ebooks
 Requires at least: 3.5.1
-Tested up to: 3.9
-Stable tag: 2.3
+Tested up to: 3.9.2
+Stable tag: 2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,8 +60,8 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
-= 2.2 =
-* Fixed euro currency.
+= 2.4 =
+* Fix for WPMU where IPN was failing.
 
 = 2.1 =
 * Added epub support .
