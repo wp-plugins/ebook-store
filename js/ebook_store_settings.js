@@ -7,4 +7,5 @@ jQuery(function() {
 			
 	});
 	jQuery('.goPro').css({background: '#FFB0B0', opacity: .5});
+	alert('dd');
 });
