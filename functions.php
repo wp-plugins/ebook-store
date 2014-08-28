@@ -547,7 +547,7 @@ function ebook_store( $atts ){
 	$items .= '
             <figure>
                             <div class="perspective"><div class="book" data-book="book-' . get_the_ID() . '"><div class="cover"><div data-dd="dd" class="front" style="background: url(' . @$cover['url'] . ');"></div><div class="inner inner-left"></div></div><div class="inner inner-right"></div></div></div><div class="buttons">
-                            		<a href="#" style="display:none;">Look inside</a><a href="#">Details</a><a target="_blank" href="' . @$preview['url'] . '">Preview</a>
+                            		<a href="#" style="display:none;">Look inside</a><a href="#" class="details_link">Details</a><a target="_blank" href="' . @$preview['url'] . '" class="ebook_buy_link">Preview</a>
 <a class="ebook_buy_link" href="#" onClick="document.getElementById(\'xxd\').submit(); return false;">Buy (' . $c->getSymbol(get_option('paypal_currency','USD')) . @number_format($ebook['ebook_price'],2) . ')</a>
 <form method="post" id="xxd" name="dmp_order_form" action="https://www' . (get_option('paypal_sandbox') != '' ? '.sandbox' : '') . '.paypal.com/cgi-bin/webscr">
 		<input type="hidden" name="rm" value="0">
