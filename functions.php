@@ -158,7 +158,7 @@ function ebook_add_custom_meta_boxes() {
 			// Define the custom attachment for posts
 			add_meta_box(
 			'ebook_code_box',
-			'Put this code inside the post',
+			'eBook Embed Code Box',
 			'ebook_code_box',
 			'ebook',
 			'side'
@@ -245,7 +245,8 @@ function ebook_wp_custom_attachment() {
 	}
 	@$ebook_publishers .= '<option value="' . get_the_ID() . '"' . $selected . '>' . get_the_title() . '</option>';
 	endwhile;
-	$html .= '<div style="float:none; clear:both; overflow:auto;"><div class="ebookSeller50Percent">';
+	$html .= '<div style="float:none; clear:both; overflow:auto;"><div class="ebookSeller50Percent">
+			<h1 style="line-height:1.5em;">After you have uploaded the book, please copy the code from the "eBook Embed Code Box", and paste it inside the article or page where you want the eBook ordering form to appear.</h1>';
 	$html .= '<p class="">Upload your eBook file here' . (@$img['url'] != '' ? '<br class="clear">Currently uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">' . @basename($img['url']) . '</a>' : '<br />Ebook file is still not uploaded.');
 	$html .= '<br /><input type="file" id="ebook_wp_custom_attachment" name="ebook_wp_custom_attachment" value="" size="25">';
 	$html .= '</p>';
@@ -285,6 +286,7 @@ jQuery(document).ready(function() {
     jQuery(\'#ebook_date\').datepicker({
         dateFormat : \'dd-mm-yy\'
     });
+	jQuery(\'#wp-admin-bar-view\').hide();
 });
 </script>
     ';
