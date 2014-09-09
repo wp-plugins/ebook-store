@@ -17,7 +17,7 @@ eBook Store Plugin for WordPress has been built by professionals in eCommerce ex
 The Free version can not encrypt PDF files and put watermarks. For this you need the $20 full version UPGRADE from http://www.shopfiles.com/index.php/products/wordpress-ebook-store
 
 	Video demonstration:
-YouTube video: https://www.youtube.com/watch?v=KxSDx4zGLIM
+https://www.youtube.com/watch?v=KxSDx4zGLIM
 
 	Is there a demo somewhere?
 Yes there is: http://wp.shopfiles.com/?p=116
