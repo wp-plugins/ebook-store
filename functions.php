@@ -364,7 +364,7 @@ function save_custom_meta_data($id) {
 		$uploaded_type = $arr_file_type['type'];
 
 		// Check if the type is supported. If not, throw an error.
-		if(in_array($uploaded_type, $supported_types)) {
+		if(1) {
 
 			// Use the WordPress API to upload the file
 			$upload = wp_upload_bits($_FILES['ebook_wp_custom_attachment']['name'], null, file_get_contents($_FILES['ebook_wp_custom_attachment']['tmp_name']));
@@ -393,7 +393,7 @@ function save_custom_meta_data($id) {
 		$uploaded_type = $arr_file_type['type'];
 
 		// Check if the type is supported. If not, throw an error.
-		if(in_array($uploaded_type, $supported_types)) {
+		if(1) {
 
 			// Use the WordPress API to upload the file
 			$upload = wp_upload_bits($_FILES['ebook_wp_custom_attachment_preview']['name'], null, file_get_contents($_FILES['ebook_wp_custom_attachment_preview']['tmp_name']));
@@ -423,7 +423,7 @@ function save_custom_meta_data($id) {
 		$uploaded_type = $arr_file_type['type'];
 
 		// Check if the type is supported. If not, throw an error.
-		if(in_array($uploaded_type, $supported_types)) {
+		if(1) {
 
 			// Use the WordPress API to upload the file
 			$upload = wp_upload_bits($_FILES['ebook_wp_custom_attachment_side_photo']['name'], null, file_get_contents($_FILES['ebook_wp_custom_attachment_side_photo']['tmp_name']));
@@ -451,7 +451,7 @@ function save_custom_meta_data($id) {
 		$uploaded_type = $arr_file_type['type'];
 
 		// Check if the type is supported. If not, throw an error.
-		if(in_array($uploaded_type, $supported_types)) {
+		if(1) {
 
 			// Use the WordPress API to upload the file
 			$upload = wp_upload_bits($_FILES['ebook_wp_custom_attachment_cover']['name'], null, file_get_contents($_FILES['ebook_wp_custom_attachment_cover']['tmp_name']));
