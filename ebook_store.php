@@ -4,7 +4,7 @@ Plugin Name: eBook store
 Plugin URI: http://shopfiles.com/
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
-Author URI:http://motov.net/
+Author URI:http://shopfiles.com/
 Version: 2.7
 License: GPLv2
 */
