@@ -14,6 +14,9 @@ Stylish and modern ebook seller plugin, with 3D book preview, optional preview f
 eBook Store Plugin for WordPress has been built by professionals in eCommerce extensions working more than 6 years in providing paid downloads solutions for both Joomla nad WordPress.
 The pro version is catable of encrypting the ebooks upon download or email delivery.
 
+	Sample thank you page and encrypted PDF
+http://wp.shopfiles.com/?p=116&ebook_key=e6459008deb37be298d8c522c8bb2ff1&action=thank_you
+
 	Are there any limitations?
 The Free version can not encrypt PDF files and put watermarks. For this you need the $20 full version UPGRADE from http://www.shopfiles.com/index.php/products/wordpress-ebook-store
 
