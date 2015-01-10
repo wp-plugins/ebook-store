@@ -7,11 +7,12 @@ Stable tag: 2.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin will allow you to sell ebooks in various formats like PDF, mobi and etc. If you upgrade to Pro version, you will also be able to watermark / encrypt pdf files.
+Stylish and modern ebook seller plugin, with 3D book preview, optional preview file for each book, automated email delivery and order processing.
 
 == Description ==
 
-eBook Store Plugin for WordPress has been built by professionals in eCommerce extensions working more than 6 years in providing paid downloads solutions for both Joomla nad WordPress. 
+eBook Store Plugin for WordPress has been built by professionals in eCommerce extensions working more than 6 years in providing paid downloads solutions for both Joomla nad WordPress.
+The pro version is catable of encrypting the ebooks upon download or email delivery.
 
 	Are there any limitations?
 The Free version can not encrypt PDF files and put watermarks. For this you need the $20 full version UPGRADE from http://www.shopfiles.com/index.php/products/wordpress-ebook-store
