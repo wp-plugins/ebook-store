@@ -21,7 +21,7 @@ http://wp.shopfiles.com/?p=116&ebook_key=e6459008deb37be298d8c522c8bb2ff1&action
 The Free version can not encrypt PDF files and put watermarks. For this you need the $20 full version UPGRADE from http://www.shopfiles.com/index.php/products/wordpress-ebook-store
 
 	Video demonstration:
-https://www.youtube.com/watch?v=KxSDx4zGLIM
+https://www.youtube.com/watch?v=T0mrdvrbmbc
 
 	Is there a demo somewhere?
 Yes there is: http://wp.shopfiles.com/?p=116
