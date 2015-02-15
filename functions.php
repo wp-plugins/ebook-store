@@ -546,12 +546,13 @@ function ebook_store( $atts ){
 	$publishers = @implode(", ", $publishers);
 	$authors = @implode(", ", $authors);
 	/* div class front, where is it?*/
+	$md5rand = md5(rand(1,10000) . microtime());
 	$items .= '
             <figure>
                             <div class="perspective"><div class="book" data-book="book-' . get_the_ID() . '"><div class="cover"><div data-dd="dd" class="front" style="background: url(' . @$cover['url'] . ');"></div><div class="inner inner-left"></div></div><div class="inner inner-right"></div></div></div><div class="buttons">
                             		<a href="#" style="display:none;">Look inside</a><a href="#" class="details_link">Details</a><a target="_blank" href="' . (@$preview['url'] != '' ? $preview['url'] : '" style="display:none;') . '" class="">Preview</a>
-<a class="ebook_buy_link" href="#" onClick="document.getElementById(\'xxd\').submit(); return false;">Buy (' . $c->getSymbol(get_option('paypal_currency','USD')) . @number_format($ebook['ebook_price'],2) . ')</a>
-<form method="post" id="xxd" name="dmp_order_form" action="https://www' . (get_option('paypal_sandbox') != '' ? '.sandbox' : '') . '.paypal.com/cgi-bin/webscr">
+<a class="ebook_buy_link" href="#" onClick="document.getElementById(\'' . $md5rand . '\').submit(); return false;">Buy (' . $c->getSymbol(get_option('paypal_currency','USD')) . @number_format($ebook['ebook_price'],2) . ')</a>
+<form method="post" id="' . $md5rand . '" name="dmp_order_form" action="https://www' . (get_option('paypal_sandbox') != '' ? '.sandbox' : '') . '.paypal.com/cgi-bin/webscr">
 		<input type="hidden" name="rm" value="0">
 		<input type="hidden" name="discount_rate" value="0">
 		<input type="hidden" name="cmd" value="_xclick">
