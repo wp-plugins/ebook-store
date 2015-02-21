@@ -66,6 +66,9 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
+= 3.1 =
+* Ability to add a thank you page for your customers after checkout.
+
 = 3.0 =
 * Fixed problem with paypal form submission when there are more than one books on page.
 

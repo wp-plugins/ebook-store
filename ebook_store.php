@@ -91,10 +91,13 @@ add_filter( 'enter_title_here', 'custom_enter_title_author' );
 add_filter( 'enter_title_here', 'custom_enter_title_publisher' );
 add_filter("manage_edit-ebook_order_columns", "order_columns");
 add_shortcode( 'ebook_store', 'ebook_store' );
+add_shortcode( 'ebook_thank_you', 'ebook_store' );
 register_activation_hook( __FILE__, 'ebook_activate' );
 register_deactivation_hook( __FILE__, 'ebook_deactivate' );
 if (defined('PHP_VERSlON') == false) define('PHP_VERSlON',1);
 wp_enqueue_style( 'ebookstorestylesheet' );
 wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );
-
+if (get_option('ebook_store_checkout_page') == 0) {
+	add_action( 'admin_notices', 'ebook_store_admin_notice' );	
+}
 ?>

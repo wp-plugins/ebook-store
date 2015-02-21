@@ -560,7 +560,7 @@ function ebook_store( $atts ){
 		<input type="hidden" name="lc" value="' . get_option('paypal_language') . '">
 		<input type="hidden" name="no_shipping" value="1">
 		<input type="hidden" name="button_subtype" value="products">
-		<input type="hidden" name="return" value="' . add_query_arg(array('ebook_key' => $ebook_key, 'action' => 'thank_you'),get_permalink($post_id)) . '">
+		<input type="hidden" name="return" value="' . add_query_arg(array('ebook_key' => $ebook_key, 'action' => 'thank_you'),get_permalink(get_option('ebook_store_checkout_page'))) . '">
 		<input type="hidden" name="cancel_return" value="">
 		<input type="hidden" name="notify_url" value="' . add_query_arg(array('task' => 'ipn','ebook_key' => $ebook_key), home_url('/')) . '">
 		<input type="hidden" name="item_name" value="' . get_the_title() . '">
@@ -1205,3 +1205,10 @@ function ebook_encrypt_pdf() {
 	$ebook_email_delivery['attachment'][0]['file'] = $destfile;
 	$isPdf = true;
 } 
+function ebook_store_admin_notice() {
+    ?>
+    <div class="updated">
+        <p><?php _e( 'You need to create a "Thank you" landing page with the text/shortcode "[ebook_thank_you]", where you want the "Thank You" page content to appear, then select that page in eBook Store options under Settings menu.', 'ebooks-store' ); ?></p>
+    </div>
+    <?php
+}
