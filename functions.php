@@ -11,7 +11,7 @@ function ebook_deactivate() {
 
 function ebook_create_post_type() {
 	$labels = array(
-			'name' => _x('eBook Seller', 'post type general name'),
+			'name' => _x('eBook Store', 'post type general name'),
 			'singular_name' => _x('eBook', 'post type singular name'),
 			'add_new' => _x('Add New eBook', 'ebook'),
 			'add_new_item' => __('Add New eBook Item'),
