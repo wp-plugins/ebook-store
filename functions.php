@@ -561,7 +561,7 @@ function ebook_store( $atts ){
 		<input type="hidden" name="no_shipping" value="1">
 		<input type="hidden" name="button_subtype" value="products">
 		<input type="hidden" name="return" value="' . add_query_arg(array('ebook_key' => $ebook_key, 'action' => 'thank_you'),get_permalink(get_option('ebook_store_checkout_page'))) . '">
-		<input type="hidden" name="cancel_return" value="">
+		<input type="hidden" name="cancel_return" value="' . add_query_arg(array('ebook_key' => $ebook_key, 'action' => 'cancel'),get_permalink(get_option('ebook_store_cancel_page'))) . '">
 		<input type="hidden" name="notify_url" value="' . add_query_arg(array('task' => 'ipn','ebook_key' => $ebook_key), home_url('/')) . '">
 		<input type="hidden" name="item_name" value="' . get_the_title() . '">
 		<input type="hidden" name="item_number" value="1">

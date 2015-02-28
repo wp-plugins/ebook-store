@@ -38,7 +38,7 @@ function register_ebook_store_settings() {
 	register_setting( 'ebook-settings-group', 'paypal_language' );
 	register_setting( 'ebook-settings-group', 'downloads_limit' );
     register_setting( 'ebook-settings-group', 'ebook_store_checkout_page' );
-	//email_delivery_subject
+    register_setting( 'ebook-settings-group', 'ebook_store_cancel_page' );
 	
 }
 
@@ -115,8 +115,9 @@ wp_enqueue_script( 'ebook_store_settings', plugins_url( '/js/ebook_store_setting
         <th scope="row">PayPal account</th>
         <td><input type="text" name="paypal_account" value="<?php echo get_option('paypal_account'); ?>" placeholder="Your@PayPal" /></td>
         </tr>
+        
         <tr>
-        <th scope="row">Checkout page
+        <th scope="row">Thank You page
         </th>
         <td valign="top">        
             <?php
@@ -139,7 +140,35 @@ wp_dropdown_pages($args);
         This page should contain the shortcode <b>[ebook_thank_you]</b>, where you want the "Thank you" page content to appear.
         </span>
         </td>
-        </tr>        
+        </tr>
+
+        <tr>
+        <th scope="row">Order Cancelled Page
+        </th>
+        <td valign="top">        
+            <?php
+$args = array(
+    'depth'                 => 0,
+    'child_of'              => 0,
+    'selected'              => get_option('ebook_store_cancel_page'),
+    'echo'                  => 1,
+    'name'                  => 'ebook_store_cancel_page',
+    'id'                    => null, // string
+    'show_option_none'      => '-- Please select --', // string
+    'show_option_no_change' => null, // string
+    'option_none_value'     => '0', // string
+    'post_type' => 'page'
+);
+wp_dropdown_pages($args);
+
+            ?>
+            <span class="description">
+        This page will be shown if the customer decides to cancel the order at PayPal.
+        </span>
+        </td>
+        </tr>
+
+
         <tr valign="top">
         <th scope="row">PayPal currency</th>
         <td>

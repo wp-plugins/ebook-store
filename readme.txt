@@ -3,7 +3,7 @@ Contributors: motov.net
 Tags: paypal, epub, paid downloads, sell, files, ebook, ebooks, paid, downloads, qr code, sell ebook, pdf drm, watermark, ecnrypt, pdf, mobi, sell ebooks
 Requires at least: 3.5.1
 Tested up to: 4.1.1
-Stable tag: 3.1
+Stable tag: 3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,6 +65,9 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 3.2 =
+* Ability to select order cancellation page.
 
 = 3.1 =
 * Ability to add a thank you page for your customers after checkout.
