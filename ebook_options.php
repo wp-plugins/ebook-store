@@ -253,7 +253,7 @@ wp_dropdown_pages($args);
         
         <tr valign="top" class="goPro">
         <th scope="row">Buyer info text</th>
-        <td><input type="text" size="130" value="<?php 
+        <td><input name="buyer_info_text" type="text" size="130" value="<?php 
         echo get_option('buyer_info_text',$op->buyer_info_text);
         ?>" /></td>
         </tr>

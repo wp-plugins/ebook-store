@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: eBook store
-Plugin URI: http://shopfiles.com/
+Plugin URI: https://www.shopfiles.com/index.php/products/wordpress-ebook-store
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
-Author URI:http://shopfiles.com/
+Author URI:https://www.shopfiles.com/index.php/products/wordpress-ebook-store
 Version: 3.4
 License: GPLv2
 */
