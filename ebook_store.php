@@ -5,13 +5,14 @@ Plugin URI: http://shopfiles.com/
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
 Author URI:http://shopfiles.com/
-Version: 3.2
+Version: 3.3
 License: GPLv2
 */
 
 include_once('functions.php');
 include_once('class_qswpoptions.php');
 include_once('ebook_options.php');
+
 
 add_action('init', 'check_ipn');
 
@@ -58,6 +59,7 @@ function check_ipn() {
 				$order['downloadlink'] = ebook_download_link($ebook_order);
 				update_post_meta($post_id,'ebook_key',$ebook_key);
 				update_post_meta($post_id,'downloads',0);
+				update_post_meta($post_id,'downloadlink',$order['downloadlink']);
 				update_post_meta($post_id,'ebook',$custom[0]);
 				$attachment = ebook_attachment($custom[0]);
 				global $attachment;
@@ -100,4 +102,17 @@ wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __
 if (get_option('ebook_store_checkout_page') == 0) {
 	add_action( 'admin_notices', 'ebook_store_admin_notice' );	
 }
+
+//3.3
+add_filter('post_updated_messages', 'ebook_store_set_messages' );
+add_filter( 'get_sample_permalink_html', 'ebook_store_remove_parmelink' );
+add_filter( 'pre_get_shortlink', function( $false, $post_id ) {
+    return 'ebook' === get_post_type( $post_id ) ? '' : $false;
+}, 10, 2 );
+add_action( 'admin_head-post-new.php', 'ebook_admin_css' );
+add_action( 'admin_head-post.php', 'ebook_admin_css' );
+add_filter( 'manage_edit-ebook_columns', 'ebook_store_set_columns' ) ;
+add_action( 'manage_ebook_posts_custom_column', 'ebook_store_columns_output', 10, 2 );
+
+
 ?>

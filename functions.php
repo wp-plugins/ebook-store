@@ -37,8 +37,8 @@ function ebook_create_post_type() {
 			'capability_type' => 'post',
 			'hierarchical' => true,
 			'menu_position' => 5,
-			'taxonomies' => array('category'),
-			'supports' => array('title','editor','thumbnail')
+			//'taxonomies' => array('category'),
+			'supports' => array('title','editor')
 	);
 
 	register_post_type( 'ebook' , $args );
@@ -219,7 +219,7 @@ function ebook_code_box() {
 function ebook_wp_custom_attachment() {
 	wp_enqueue_script('jquery-ui-datepicker');
 	wp_enqueue_style('jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
-	wp_enqueue_script( 'zeroslipboard', plugins_url( '/js/zeroclipboard-1.3.1/ZeroClipboard.js' , __FILE__ ), array(), '1.0.0', true );
+	
 
 	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment', true);
 	$ebook = get_post_meta(get_the_ID(), 'ebook', true);
@@ -495,6 +495,8 @@ function humanFileSize($size,$unit="") {
 	return number_format($size)." bytes";
 }
 function ebook_store( $atts ){
+	include('locale.php');
+	
 	$post_id = get_the_ID();
 	if (@$_REQUEST['ebook_key'] != false && @$_REQUEST['action'] == 'thank_you') {
 		$content = get_option('thankyou_page',true);
@@ -547,18 +549,19 @@ function ebook_store( $atts ){
 	$authors = @implode(", ", $authors);
 	/* div class front, where is it?*/
 	$md5rand = md5(rand(1,10000) . microtime());
+
 	$items .= '
             <figure>
                             <div class="perspective"><div class="book" data-book="book-' . get_the_ID() . '"><div class="cover"><div data-dd="dd" class="front" style="background: url(' . @$cover['url'] . ');"></div><div class="inner inner-left"></div></div><div class="inner inner-right"></div></div></div><div class="buttons">
-                            		<a href="#" style="display:none;">Look inside</a><a href="#" class="details_link">Details</a><a target="_blank" href="' . (@$preview['url'] != '' ? $preview['url'] : '" style="display:none;') . '" class="">Preview</a>
-<a class="ebook_buy_link" href="#" onClick="document.getElementById(\'' . $md5rand . '\').submit(); return false;">Buy (' . $c->getSymbol(get_option('paypal_currency','USD')) . @number_format($ebook['ebook_price'],2) . ')</a>
+                            		<a href="#" style="display:none;">Look inside</a><a href="#" class="details_link">' . $locale['details'] . '</a><a target="_blank" href="' . (@$preview['url'] != '' ? $preview['url'] : '" style="display:none;') . '" class="">' . $locale['preview'] . '</a>
+<a class="ebook_buy_link" href="#" onClick="document.getElementById(\'' . $md5rand . '\').submit(); return false;">' . $locale['buy'] . ' (' . $c->getSymbol(get_option('paypal_currency','USD')) . @number_format($ebook['ebook_price'],2) . ')</a>
 <form method="post" id="' . $md5rand . '" name="dmp_order_form" action="https://www' . (get_option('paypal_sandbox') != '' ? '.sandbox' : '') . '.paypal.com/cgi-bin/webscr">
 		<input type="hidden" name="rm" value="0">
 		<input type="hidden" name="discount_rate" value="0">
 		<input type="hidden" name="cmd" value="_xclick">
 		<input type="hidden" name="charset" value="utf-8">
 		<input type="hidden" name="lc" value="' . get_option('paypal_language') . '">
-		<input type="hidden" name="no_shipping" value="1">
+		<input type="hidden" name="no_shipping" value="' . get_option('ebook_store_require_shipping') . '">
 		<input type="hidden" name="button_subtype" value="products">
 		<input type="hidden" name="return" value="' . add_query_arg(array('ebook_key' => $ebook_key, 'action' => 'thank_you'),get_permalink(get_option('ebook_store_checkout_page'))) . '">
 		<input type="hidden" name="cancel_return" value="' . add_query_arg(array('ebook_key' => $ebook_key, 'action' => 'cancel'),get_permalink(get_option('ebook_store_cancel_page'))) . '">
@@ -581,8 +584,8 @@ function ebook_store( $atts ){
                                 <ul>
                                     <li>' . get_the_content() . '</li>
                                     <li>' . $publishers . '</li>
-                                    <li>' . date("F j, Y",strtotime($ebook['ebook_date'])) . '</li>
-                                    <li>' . $ebook['ebook_pages'] . ' pages</li>
+                                    <li>' . ($ebook['ebook_date'] > 0 ? date("F j, Y",strtotime($ebook['ebook_date'])) : '') . '</li>
+                                    <li>' . ($ebook['ebook_pages'] > 0 ? $ebook['ebook_pages'] . ' pages' : '') . '</li>
                                 </ul>
                             <span class="close-details"></span></div>
             </figure>
@@ -750,6 +753,8 @@ function order_columns($columns)
 			'product'	=>	'Product',
 			'amount'	=>	'Amount',
 			'country'	=> 	'Country',
+			'shipping_address'	=> 	'Shipping Address',
+			'downloadlink'	=> 	'Download Link',
 			'date'		=>	'Date',
 			'downloads'		=>	'Downloads',
 	);
@@ -766,10 +771,24 @@ function order_custom_columns($column)
 		case "amount":
 			$mc_currency = get_post_meta($post->ID,'mc_currency',true);
 			$mc_gross = get_post_meta($post->ID,'mc_gross',true);
-			echo $c->getSymbol($mc_currency) . money_format("%.2n", $mc_gross);
+			$mc_fee = get_post_meta($post->ID,'mc_fee',true);
+			$total = $mc_gross - $mc_fee;
+			$mc_fee = "Fee -" . $c->getSymbol($mc_currency) . number_format(get_post_meta($post->ID,'mc_fee',true),2);
+			echo $c->getSymbol($mc_currency) . number_format($mc_gross,2) . "<br /><small>$mc_fee<br />Net: {$c->getSymbol($mc_currency)}$total</small>";
 			break;
 		case "country":
 			echo get_post_meta($post->ID,'residence_country',true);
+			break;
+		case "shipping_address":
+			$address_name = get_post_meta($post->ID,'address_name',true);
+			$address_state = get_post_meta($post->ID,'address_state',true);
+			$address_status = get_post_meta($post->ID,'address_status',true);
+			$address_country_code = get_post_meta($post->ID,'address_country_code',true);
+			$address_country = get_post_meta($post->ID,'address_country',true);
+			$address_city = get_post_meta($post->ID,'address_city',true);
+			$address_zip = get_post_meta($post->ID,'address_zip',true);
+			$address_street = get_post_meta($post->ID,'address_street',true);
+			echo "$address_name<br />$address_street<br />$address_city, $address_state, $address_zip<br />$address_country<br />Status: $address_status";
 			break;
 		case "paypal":
 			echo get_post_meta($post->ID,'payer_email',true);
@@ -777,6 +796,10 @@ function order_custom_columns($column)
 		case "downloads":
 			echo get_post_meta($post->ID,'downloads',true);
 			break;
+		case 'downloadlink':
+			$downloadlink = get_post_meta($post->ID,'downloadlink',true);
+			echo ($downloadlink != '' ? "<a href=\"$downloadlink\">Download</a>" : 'N/A');
+		break;
 	}
 }
 function ebook_readfile_chunked( $file, $retbytes = TRUE ) {
@@ -1208,7 +1231,90 @@ function ebook_encrypt_pdf() {
 function ebook_store_admin_notice() {
     ?>
     <div class="updated">
-        <p><?php _e( 'You need to create a "Thank you" landing page with the text/shortcode "[ebook_thank_you]", where you want the "Thank You" page content to appear, then select that page in eBook Store options under Settings menu.', 'ebooks-store' ); ?></p>
+        <p><?php _e( 'You need to create a "Thank you" landing page with the text/shortcode <input type="text" size=20 value="[ebook_thank_you]" />, where you want the "Thank You" page content to appear, then select that page in eBook Store options under Settings menu.', 'ebooks-store' ); ?></p>
     </div>
     <?php
+}
+
+function ebook_store_set_messages($messages) {
+	global $post, $post_ID;
+	$post_type = get_post_type( $post_ID );
+
+	$obj = get_post_type_object($post_type);
+	$singular = $obj->labels->singular_name;
+	if ($post_type == 'ebook') {
+		$messages[$post_type][1] = 'eBook has been saved! Now copy and paste this code in the article / page where you want the ebook order form to appear: <input onClick="" type="text" size=30 value=\'[ebook_store ebook_id="' . $post_ID . '"]\'>';
+	}
+	return $messages;
+}
+function ebook_store_remove_parmelink( $return ) {
+    $return = '';
+
+    return $return;
+}
+
+function ebook_admin_css() {
+    global $post_type;
+    $post_types = array(
+                        /* set post types */
+                        'ebook',
+                  );
+    if(in_array($post_type, $post_types))
+    echo '<style type="text/css">#post-preview, #view-post-btn{display: none;}</style>';
+}
+function ebook_store_set_columns( $columns ) {
+
+	$columns = array(
+		'cb' => '<input type="checkbox" />',
+		'cover' => __( 'Cover' ),
+		'title' => __( 'Book Title' ),
+		//'duration' => __( 'Duration' ),
+		//'genre' => __( 'Genre' ),
+		'date' => __( 'Date' ),
+		'price' => __( 'Price' ),
+		'embed_code' => __('Embed Code for posts and pages')
+	);
+
+	return $columns;
+}
+
+function ebook_store_columns_output( $column, $post_id ) {
+	global $post;
+
+	switch( $column ) {
+
+		/* If displaying the 'duration' column. */
+		
+		case 'embed_code':
+		echo '[ebook_store ebook_id="' . $post_id . '"]';
+		break;
+		case 'price':
+		$ebook = get_post_meta(get_the_ID(), 'ebook', true);
+		$c = new Currencies();
+		echo $c->getSymbol(get_option('paypal_currency','USD')) . number_format((int)$ebook['ebook_price'],2);
+		break;
+		case 'cover':
+		$cover = @get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment_cover', true);
+
+		if (!@$cover['url']) {
+			$cover['url'] = plugins_url( 'images/no-cover.png', dirname(__FILE__) );	
+			$cover = "N/A";
+		} else {
+			$cover = "<img src=\"{$cover[url]}\" style=\"max-width:100px;\" />
+<style>
+.column-cover {
+	width:120px;
+}
+</style>
+			";
+		}
+
+		
+		echo $cover;
+
+		break;
+		/* Just break out of the switch statement for everything else. */
+		default :
+			break;
+	}
 }

@@ -39,7 +39,7 @@ function register_ebook_store_settings() {
 	register_setting( 'ebook-settings-group', 'downloads_limit' );
     register_setting( 'ebook-settings-group', 'ebook_store_checkout_page' );
     register_setting( 'ebook-settings-group', 'ebook_store_cancel_page' );
-	
+    register_setting( 'ebook-settings-group', 'ebook_store_require_shipping' );
 }
 
 
@@ -220,6 +220,11 @@ wp_dropdown_pages($args);
         <td><input type="checkbox" name="paypal_verify_transactions" value="1" <?php echo (get_option('paypal_verify_transactions',$op->paypal_verify_transactions) != 0 ? 'checked="checked"' : ''); ?> /></td>
         </tr>
         
+        <tr valign="top" class="">
+        <th scope="row">Ask buyer for address at PayPal</span></th>
+        <td><select name="ebook_store_require_shipping"><option value="0"<?php echo (get_option('ebook_store_require_shipping') == '0' ? ' selected="selected"' : ''); ?>>Optional</option><option value="1"<?php echo (get_option('ebook_store_require_shipping') == '1' ? ' selected="selected"' : ''); ?>>Do not require address</option><option value="2"<?php echo (get_option('ebook_store_require_shipping') == '2' ? ' selected="selected"' : ''); ?>>Require Address</option></select></td>
+        </tr>
+
         <tr valign="top" class="goPro">
         <th scope="row">Encrypt PDF Files</span></th>
         <td><input type="checkbox" name="encrypt_pdf"  value="1" <?php echo (get_option('encrypt_pdf') != 0 ? 'checked="checked"' : ''); ?> /></td>
