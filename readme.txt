@@ -3,7 +3,7 @@ Contributors: motov.net
 Tags: paypal, epub, paid downloads, sell, files, ebook, ebooks, paid, downloads, qr code, sell ebook, pdf drm, watermark, ecnrypt, pdf, mobi, sell ebooks
 Requires at least: 3.5.1
 Tested up to: 4.1.1
-Stable tag: 3.3
+Stable tag: 3.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,7 +15,10 @@ eBook Store Plugin for WordPress has been built by professionals in eCommerce ex
 The pro version is catable of encrypting the ebooks upon download or email delivery.
 
 	Sample thank you page and encrypted PDF
-http://wp.shopfiles.com/?page_id=577&ebook_key=b3f4317c48bf2bb1ff243d752b7b7f36&action=thank_you
+http://wp.shopfiles.com/?page_id=577&ebook_key=a8ae3b7100a7c5f9eb80e5d9fc3cb55d&action=thank_you
+
+	Are there translations?
+Yes, the front-end of the software is translated to: English, German, French, Spanish, Hindi, Chinese and Russian. More translations are coming.
 
 	Are there any limitations?
 The Free version can not encrypt PDF files and put watermarks. For this you need the $20 full version UPGRADE from http://www.shopfiles.com/index.php/products/wordpress-ebook-store
@@ -65,6 +68,10 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 3.4 =
+* Added translations to frontend: Russian, English, German, Hindi, Chinese, Spanish, French.
+* Added download link copy in the email, ability to save addresses of buyers and more.
 
 = 3.3 =
 * Usability improvements and video guide added.

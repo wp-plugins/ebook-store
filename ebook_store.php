@@ -5,7 +5,7 @@ Plugin URI: http://shopfiles.com/
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
 Author URI:http://shopfiles.com/
-Version: 3.3
+Version: 3.4
 License: GPLv2
 */
 
@@ -61,23 +61,28 @@ function check_ipn() {
 				update_post_meta($post_id,'downloads',0);
 				update_post_meta($post_id,'downloadlink',$order['downloadlink']);
 				update_post_meta($post_id,'ebook',$custom[0]);
-				$attachment = ebook_attachment($custom[0]);
+				
 				global $attachment;
-				mail(get_option( 'admin_email' ), 'eBook store for WordPress - Verified Order Received', $listener->getTextReport() . print_r($attachment,true));
-				//wp_mail($_REQUEST['payer_email'],get_option('email_delivery_subject'),'Email delivery text');
+				$attachment = ebook_attachment($custom[0]);
 				$ebook_email_delivery = array('to' => $_REQUEST['payer_email'], 'subject' => get_option('email_delivery_subject'), 'text' => get_option('email_delivery_text'),'attachment' => $attachment, 'order' => $order);
-				if (pathinfo($attachment[0]['file'],PATHINFO_EXTENSION) == 'pdf' && get_option('encrypt_pdf')) {
-					add_action( 'plugins_loaded', 'ebook_encrypt_pdf', 99 );
+				//mail(get_option( 'admin_email' ), 'eBook store for WordPress - Verified Order Received', print_r($ebook_email_delivery,true));
+				//wp_mail($_REQUEST['payer_email'],get_option('email_delivery_subject'),'Email delivery text');
+				$fileExt = pathinfo($attachment[0]['file'],PATHINFO_EXTENSION);
+				if ($fileExt == 'pdf' && get_option('encrypt_pdf')) {
+					add_action( 'init', 'ebook_encrypt_pdf', 99 );
+					error_log('ecnrypt pdf added to init');
 				}
 				
-				add_action( 'plugins_loaded', 'ebook_email_delivery', 100 );
+				add_action( 'init', 'ebook_email_delivery', 100);
+				error_log('ebook_email_delivery added to plugins_loaded');
 				//array('to' => $_REQUEST['payer_email'], 'subject' => get_option('email_delivery_subject'), 'text' => 'teeext', 'file' => $attachment[0]['file'])
 			} else {
 				mail(get_option( 'admin_email' ), 'eBook store for WordPress - Possible fraud attempt ', $listener->getTextReport());
 			}
-	
+		header("HTTP/1.1 200 OK");
+		//die('OK');
 		} else {
-			mail(get_option( 'admin_email' ), 'eBook store for WordPress - Possible fraud attempt', $listener->getTextReport());
+			mail(get_option( 'admin_email' ), 'eBook store for WordPress - Possible fraud attempt', $listener->getTextReport() . "\n\n\n" . md5(NONCE_KEY . $custom[0] . $mc_gross) == $custom[1]);
 		}
 		
 	}

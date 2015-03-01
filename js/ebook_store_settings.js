@@ -6,5 +6,7 @@ jQuery(function() {
 		}
 			
 	});
-	jQuery('.goPro').css({background: '#FFB0B0', opacity: .5});
+	jQuery('.goPro').css({background: '#FFB0B0', opacity: 1});
+	//jQuery('.goPro').last().remove();
+	//jQuery('.goPro').last().remove();
 });

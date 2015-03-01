@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 function ebook_activate() {
 	// register taxonomies/post types here
 	flush_rewrite_rules();
@@ -502,7 +503,7 @@ function ebook_store( $atts ){
 		$content = get_option('thankyou_page',true);
 		$ebook_order = ebook_get_order('ebook_key', $_REQUEST['ebook_key']);
 		if (!$ebook_order) {
-			return 'Sorry, order not found, please wait the screen will refresh in 5 seconds!<script>   window.setTimeout(\'location.reload()\', 5000);
+			return 'Sorry, PayPal has not confirmed your payment yet, please wait the screen will refresh in 5 seconds!<script>   window.setTimeout(\'location.reload()\', 5000);
 </script>';
 		}
 		$file = get_post_meta($ebook_order['ebook'][0],'ebook_wp_custom_attachment',true);
@@ -1189,10 +1190,16 @@ function ebook_attachment($post_id) {
 	return get_post_meta($post_id,'ebook_wp_custom_attachment');
 }
 function ebook_encrypt_pdf() {
-	global $ebook_email_delivery, $ebook_qr_text, $ebook_png_path, $ebook_pngname, $attachment;
+	global $ebook_email_delivery, $ebook_qr_text, $ebook_png_path, $ebook_pngname, $attachment, $pdfHeaderText;
+	require_once('fpdi/fpdf.php');
+	require_once('fpdi/fpdi.php');
 	require_once('fpdi/FPDI_Protection.php');
 	require_once('fpdi/qrcode.class.php');
 	$ebook_qr_text = "Txn: " . $_REQUEST['txn_id'] . ' Date: ' . $_REQUEST['payment_date'] . ' Buyer:' . $_REQUEST['payer_email'];
+	$pdfHeaderText = get_option('buyer_info_text');
+	foreach ($_REQUEST as $k => $v) {
+		$pdfHeaderText = str_replace("%%$k%%", $v, $pdfHeaderText);
+	}
 	$qrclass = new QRClass;
 	$path = $qrclass->text($ebook_qr_text, 100, 100);
 	$ebook_pngname = md5($path) . '.png';
@@ -1203,6 +1210,7 @@ function ebook_encrypt_pdf() {
 	$password = $_REQUEST['payer_email'];
 	mkdir(plugin_dir_path( __FILE__ ) . 'cache/' . md5($path), 0755, true);
 	$destfile = plugin_dir_path( __FILE__ ) . 'cache/' . md5($path) . '/' . basename($file);
+	//error_log('encrypting ' . $file);
 	$pdf = new QRPDF();
 	//TODO: Get source size
 	if (get_option('pdf_orientation') == 'portrait') {
@@ -1210,11 +1218,11 @@ function ebook_encrypt_pdf() {
 	} else {
 		$pdf->FPDF('P', 'in', array('11.69','8.27'));
 	}
-	
 	$pagecount = $pdf->setSourceFile($file);
 	for ($loop = 1; $loop <= $pagecount; $loop++) {
 		$tplidx = $pdf->importPage($loop);
 		$pdf->addPage();
+		//error_log('page ' . $loop);
 		$pdf->useTemplate($tplidx);
 	}
 	if (get_option('allow_pdf_printing')) {

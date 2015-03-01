@@ -40,6 +40,8 @@ function register_ebook_store_settings() {
     register_setting( 'ebook-settings-group', 'ebook_store_checkout_page' );
     register_setting( 'ebook-settings-group', 'ebook_store_cancel_page' );
     register_setting( 'ebook-settings-group', 'ebook_store_require_shipping' );
+    register_setting( 'ebook-settings-group', 'buyer_info' );
+    register_setting( 'ebook-settings-group', 'buyer_info_text' );
 }
 
 
@@ -227,22 +229,35 @@ wp_dropdown_pages($args);
 
         <tr valign="top" class="goPro">
         <th scope="row">Encrypt PDF Files</span></th>
-        <td><input type="checkbox" name="encrypt_pdf"  value="1" <?php echo (get_option('encrypt_pdf') != 0 ? 'checked="checked"' : ''); ?> /></td>
+        <td><input type="checkbox" name="encrypt_pdf"  value="1" <?php echo (get_option('encrypt_pdf') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">This will option will enable encrypted delivery, both via email as attachment (if enabled) and via site download. The password of the encrypted PDF file is always the buyer's PayPal email address.</span></td>
         </tr>
         
              
         <tr valign="top" class="goPro">
         <th scope="row">Allow PDF Printing</span></th>
-        <td><input type="checkbox" name="allow_pdf_printing"  value="1"  <?php echo (get_option('allow_pdf_printing') != 0 ? 'checked="checked"' : ''); ?> /></td>
+        <td><input type="checkbox" name="allow_pdf_printing"  value="1"  <?php echo (get_option('allow_pdf_printing') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">If you want your encrypted PDF files to be printed, enable this option. Otherwise the PDF files you sell will only be readable on a computer, and can not be printed.</span></td>
         </tr>
         
              
         <tr valign="top" class="goPro">
         <th scope="row">QR Code
         <span class="description">(<a href="http://shopfiles.com/samples/protected_cv.pdf" target="_blank">see sample</a>, PDF only)</span></th>
-        <td><input type="checkbox" name="qr_code"  value="1" <?php echo (get_option('qr_code') != 0 ? 'checked="checked"' : ''); ?> /></td>
+        <td><input type="checkbox" name="qr_code"  value="1" <?php echo (get_option('qr_code') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">Once enabled, every page will have a QR code watermark on bottom right corner. Once scanned with any Android / iOS device it gives information for the buyer in case the file is pirated online / offline.</span></td>
         </tr>
 
+        <tr valign="top" class="goPro">
+        <th scope="row">Buyer Info in header
+        </th>
+        <td><input type="checkbox" name="buyer_info"  value="1" <?php echo (get_option('buyer_info') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">This feature will print/watermark the buyer's information in the header of each page.</span></td>
+        </tr>
+        
+        <tr valign="top" class="goPro">
+        <th scope="row">Buyer info text</th>
+        <td><input type="text" size="130" value="<?php 
+        echo get_option('buyer_info_text',$op->buyer_info_text);
+        ?>" /></td>
+        </tr>
+        
         <tr valign="top" class="goPro">
         <th scope="row">PDF Orientation</span></th>
         <td><select name="pdf_orientation"><option value="portrait"<?php echo (get_option('pdf_orientation') == 'portrait' ? ' selected="selected"' : ''); ?>>Portrait</option><option value="landscape"<?php echo (get_option('pdf_orientation') == 'landscape' ? ' selected="selected"' : ''); ?>>Landscape</option></select></td>
@@ -253,6 +268,7 @@ wp_dropdown_pages($args);
         <th scope="row">Upgrade to Pro</span></th>
         <td>These features are available in the Pro version, which you can find <a href="http://www.shopfiles.com/index.php/products/wordpress-ebook-store" target="_blank" colspan="2">here</a></td>
         </tr>
+
         <tr valign="top" class="goPro">
 
         </tr>                
@@ -297,6 +313,8 @@ wp_dropdown_pages($args);
         wp_editor( get_option('email_delivery_text',$op->email_delivery_text), $editor_id );
         ?></td>
         </tr>
+        
+        
         
     </table>
     
