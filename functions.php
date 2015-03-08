@@ -233,7 +233,7 @@ function ebook_wp_custom_attachment() {
 	$new = new WP_Query('post_type=ebook_author');
 	while ($new->have_posts()) : $new->the_post();
 	unset($selected);
-	if (in_array(get_the_ID(), $ebook['ebook_author'])) {
+	if (@in_array(get_the_ID(), $ebook['ebook_author'])) {
 		$selected = ' selected';
 	}
 	@$ebook_authors .=  '<option value="' . get_the_ID() . '"' . $selected . '>' . get_the_title() . '</option>';
@@ -241,7 +241,7 @@ function ebook_wp_custom_attachment() {
 	$new = new WP_Query('post_type=ebook_publisher');
 	while ($new->have_posts()) : $new->the_post();
 	unset($selected);
-	if (in_array(get_the_ID(), $ebook['ebook_publisher'])) {
+	if (@in_array(get_the_ID(), $ebook['ebook_publisher'])) {
 		$selected = ' selected';
 	}
 	@$ebook_publishers .= '<option value="' . get_the_ID() . '"' . $selected . '>' . get_the_title() . '</option>';
