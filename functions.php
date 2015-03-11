@@ -1256,8 +1256,9 @@ function ebook_store_set_messages($messages) {
 	return $messages;
 }
 function ebook_store_remove_parmelink( $return ) {
-    $return = '';
-
+	if ('ebook' === get_post_type( $post_id )) {
+		$return = '';
+	}
     return $return;
 }
 
