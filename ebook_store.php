@@ -5,7 +5,7 @@ Plugin URI: http://shopfiles.com/
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
 Author URI:http://shopfiles.com/
-Version: 3.5
+Version: 3.6
 License: GPLv2
 */
 
@@ -23,6 +23,10 @@ function check_ipn() {
 		$listener = new IpnListener();
 		if (get_option('paypal_sandbox') > 0) {
 			$listener->use_sandbox = true;
+		}
+		$ebook_order = ebook_get_order('ebook_key', $_REQUEST['ebook_key']);
+		if ($ebook_order) {
+			return true;
 		}
 		try {
 			$listener->requirePostMethod();
@@ -74,7 +78,7 @@ function check_ipn() {
 				}
 				
 				add_action( 'init', 'ebook_email_delivery', 100);
-				error_log('ebook_email_delivery added to plugins_loaded');
+				//error_log('ebook_email_delivery added to plugins_loaded');
 				//array('to' => $_REQUEST['payer_email'], 'subject' => get_option('email_delivery_subject'), 'text' => 'teeext', 'file' => $attachment[0]['file'])
 			} else {
 				mail(get_option( 'admin_email' ), 'eBook store for WordPress - Possible fraud attempt ', $listener->getTextReport());
