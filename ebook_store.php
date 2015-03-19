@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: eBook store
-Plugin URI: http://shopfiles.com/
+Plugin URI: https://www.shopfiles.com/index.php/products/wordpress-ebook-store
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
-Author URI:http://shopfiles.com/
-Version: 3.6
+Author URI:https://www.shopfiles.com/index.php/products/wordpress-ebook-store
+Version: 3.7
 License: GPLv2
 */
 
@@ -23,10 +23,6 @@ function check_ipn() {
 		$listener = new IpnListener();
 		if (get_option('paypal_sandbox') > 0) {
 			$listener->use_sandbox = true;
-		}
-		$ebook_order = ebook_get_order('ebook_key', $_REQUEST['ebook_key']);
-		if ($ebook_order) {
-			return true;
 		}
 		try {
 			$listener->requirePostMethod();
@@ -78,7 +74,7 @@ function check_ipn() {
 				}
 				
 				add_action( 'init', 'ebook_email_delivery', 100);
-				//error_log('ebook_email_delivery added to plugins_loaded');
+				error_log('ebook_email_delivery added to plugins_loaded');
 				//array('to' => $_REQUEST['payer_email'], 'subject' => get_option('email_delivery_subject'), 'text' => 'teeext', 'file' => $attachment[0]['file'])
 			} else {
 				mail(get_option( 'admin_email' ), 'eBook store for WordPress - Possible fraud attempt ', $listener->getTextReport());
@@ -115,9 +111,8 @@ if (get_option('ebook_store_checkout_page') == 0) {
 //3.3
 add_filter('post_updated_messages', 'ebook_store_set_messages' );
 add_filter( 'get_sample_permalink_html', 'ebook_store_remove_parmelink' );
-add_filter( 'pre_get_shortlink', function( $false, $post_id ) {
-    return 'ebook' === get_post_type( $post_id ) ? '' : $false;
-}, 10, 2 );
+add_filter( 'pre_get_shortlink', 'ebook_store_pre_get_shortlink', 10, 2 );
+
 add_action( 'admin_head-post-new.php', 'ebook_admin_css' );
 add_action( 'admin_head-post.php', 'ebook_admin_css' );
 add_filter( 'manage_edit-ebook_columns', 'ebook_store_set_columns' ) ;

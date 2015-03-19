@@ -1327,3 +1327,7 @@ function ebook_store_columns_output( $column, $post_id ) {
 			break;
 	}
 }
+
+function ebook_store_pre_get_shortlink( $false, $post_id ) {
+     return 'ebook' === get_post_type( $post_id ) ? '' : $false;
+}
