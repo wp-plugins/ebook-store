@@ -1300,7 +1300,7 @@ function ebook_store_columns_output( $column, $post_id ) {
 		case 'price':
 		$ebook = get_post_meta(get_the_ID(), 'ebook', true);
 		$c = new Currencies();
-		echo $c->getSymbol(get_option('paypal_currency','USD')) . number_format((int)$ebook['ebook_price'],2);
+		echo $c->getSymbol(get_option('paypal_currency','USD')) . number_format((float)$ebook['ebook_price'],2);
 		break;
 		case 'cover':
 		$cover = @get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment_cover', true);
