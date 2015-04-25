@@ -5,7 +5,7 @@ Plugin URI: https://www.shopfiles.com/index.php/products/wordpress-ebook-store
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
 Author URI:https://www.shopfiles.com/index.php/products/wordpress-ebook-store
-Version: 3.8
+Version: 3.9
 License: GPLv2
 */
 
@@ -13,8 +13,8 @@ include_once('functions.php');
 include_once('class_qswpoptions.php');
 include_once('ebook_options.php');
 
-
 add_action('init', 'check_ipn');
+add_action('init', 'ebook_store_formContent');
 
 function check_ipn() {
 	if ($_REQUEST['task'] == 'ipn') {
@@ -28,7 +28,7 @@ function check_ipn() {
 			$listener->requirePostMethod();
 			$verified = $listener->processIpn();
 		} catch (Exception $e) {
-			error_log($e->getMessage());
+			die($e->getMessage());
 			exit(0);
 		}
 		if ($verified) {
@@ -45,7 +45,8 @@ function check_ipn() {
 				$mc_gross = $_REQUEST['mc_gross'] - $_REQUEST['tax'];
 			}
 			$mc_gross = number_format($mc_gross, 2, '.', ',');
-			if (md5(NONCE_KEY . $custom[0] . $mc_gross) == $custom[1]) {
+			$ebook = get_post_meta($custom[0], 'ebook', true);
+			if (md5(NONCE_KEY . $custom[0] . $mc_gross) == $custom[1] || $ebook['donate_or_download'] == 'donate') {
 				$post_id = wp_insert_post( $my_post, $wp_error );
 				foreach ($_REQUEST as $k => $v) {
 					update_post_meta($post_id, $k, $v);
@@ -54,11 +55,15 @@ function check_ipn() {
 				$ebook_key = preg_replace("/[^a-zA-Z0-9]+/", "", $_REQUEST['ebook_key']);
 				$order['order_id'] = $post_id;
 				$order['password'] = $_REQUEST['payer_email'];
+				$formData = ebook_store_get_form($_REQUEST['md5_nonce']);
+				$formData = json_encode($formData);
 				$ebook_order['ebook_key'][0] = $ebook_key;
 				$ebook_order['ebook'][0] = $custom[0];
 				$order['downloadlink'] = ebook_download_link($ebook_order);
 				update_post_meta($post_id,'ebook_key',$ebook_key);
 				update_post_meta($post_id,'downloads',0);
+				update_post_meta($post_id,'mc_gross',0);
+				update_post_meta($post_id,'formData',wp_slash($formData));
 				update_post_meta($post_id,'downloadlink',$order['downloadlink']);
 				update_post_meta($post_id,'ebook',$custom[0]);
 				
@@ -117,6 +122,6 @@ add_action( 'admin_head-post-new.php', 'ebook_admin_css' );
 add_action( 'admin_head-post.php', 'ebook_admin_css' );
 add_filter( 'manage_edit-ebook_columns', 'ebook_store_set_columns' ) ;
 add_action( 'manage_ebook_posts_custom_column', 'ebook_store_columns_output', 10, 2 );
-
+//add_filter('upload_mimes', 'ebook_mime_types', 1, 1);
 
 ?>

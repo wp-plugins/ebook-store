@@ -44,7 +44,6 @@ function ebook_create_post_type() {
 
 	register_post_type( 'ebook' , $args );
 
-	///////
 	$labels = array(
 			'name'               => 'Authors',
 			'singular_name'      => 'Author',
@@ -220,7 +219,7 @@ function ebook_code_box() {
 function ebook_wp_custom_attachment() {
 	wp_enqueue_script('jquery-ui-datepicker');
 	wp_enqueue_style('jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
-	
+	wp_enqueue_script( 'ebook_store_settings', plugins_url( '/js/ebook_store_settings.js' , __FILE__ ), array(), '1.0.0', true );
 
 	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment', true);
 	$ebook = get_post_meta(get_the_ID(), 'ebook', true);
@@ -248,7 +247,7 @@ function ebook_wp_custom_attachment() {
 	endwhile;
 	$html .= '<div style="float:none; clear:both; overflow:auto;"><div class="ebookSeller50Percent">
 			<h1 style="line-height:1.5em;">After you have uploaded the book, please copy the code from the "eBook Embed Code Box", and paste it inside the article or page where you want the eBook ordering form to appear.</h1>';
-	$html .= '<p class="">Supported file types in free version are: <b style="color:green;">PDF</b> and <b style="color:green;">ZIP</b>, to use <b style="color:red;">EPUB</b> and <b style="color:red;">MOBI</b> you can get the full version from here: <a target="_blank" href="https://www.shopfiles.com/index.php/products/wordpress-ebook-store">Upgrade eBook Store</a>, no data will be lost upon upgrade.<br /><br />Upload your eBook file here' . (@$img['url'] != '' ? '<br class="clear">Currently uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">' . @basename($img['url']) . '</a>' : '<br />Ebook file is still not uploaded.');
+	$html .= '<p class="">Upload your eBook file here' . (@$img['url'] != '' ? '<br class="clear">Currently uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">' . @basename($img['url']) . '</a>' : '<br />Ebook file is still not uploaded.');
 	$html .= '<br /><input type="file" id="ebook_wp_custom_attachment" name="ebook_wp_custom_attachment" value="" size="25">';
 	$html .= '</p>';
 	$html .= '<p class="">Preview of the book' . (@$preview['url'] != '' ? '<br class="clear">Currently uploaded: <a href="' . @$preview['url'] . '">' . @basename($preview['url']) . '</a>' : '<br />Preview file is still not uploaded.');
@@ -279,6 +278,10 @@ function ebook_wp_custom_attachment() {
 <p><input name="ebook[ebook_emailDelivery]" type="checkbox" value="1" . ' . (@$ebook['ebook_emailDelivery'] != '' ? 'checked' : '') . '>Send a copy to buyer\'s email</span></p>
 -->
 <p>Price<br /><input name="ebook[ebook_price]" placeholder="0.00" type="number" step="any" value="' . @$ebook['ebook_price'] . '"></p>
+<label><p class=""><input name="ebook[donate_or_download]" type="radio" value="paid" ' . (@$ebook['donate_or_download'] == 'paid' || @$ebook['donate_or_download'] == '' ? 'checked' : '') . '>Paid download <SMALL class="description">Order is placed trough PayPal and the user is returned to the site for downloading the product. Email delivery routine will be triggered.</SMALL></p></label>
+<label><p class="goPro2"><input class="goPro2" name="ebook[donate_or_download]" type="radio" value="free" ' . (@$ebook['donate_or_download'] == 'free' ? 'checked' : '') . '>Allow free download <small class="description">User is not sent to PayPal, download starts directly.</small></p></label>
+<label><p class="goPro2"><input class="goPro2" name="ebook[donate_or_download]" type="radio" value="donate" ' . (@$ebook['donate_or_download'] == 'donate' ? 'checked' : '') . '>Donate to download <small class="description">User can set a price for the ebook once it lands on PayPal.</small></p></label>
+
 </form>
 </div>
 </div>
@@ -374,7 +377,7 @@ function save_custom_meta_data($id) {
 				wp_die('There was an error uploading your file. The error is: ' . $upload['error']);
 			} else {
 				add_post_meta($id, 'ebook_wp_custom_attachment', $upload);
-				update_post_meta($id, 'ebook_wp_custom_attachment', $upload);
+				update_post_meta($id, 'ebook_wp_custom_attachment', wp_slash($upload));
 			} // end if/else
 
 		} else {
@@ -477,9 +480,17 @@ function save_custom_meta_data($id) {
 function ebook_update_edit_form() {
 	echo ' enctype="multipart/form-data"';
 } // end ebook_update_edit_form
-function ebook_download_link($ebook_order) {
-	$link = add_query_arg(array('ebook_key' => $ebook_order['ebook_key'][0], 'action' => 'download'),get_permalink($ebook_order['ebook'][0]));
+function ebook_download_link($ebook_order, $free = 0) {
+	if ($free == 0) {
+		$action_name = 'download';
+	} else {
+		$action_name = 'download_free';
+	}
+	$link = add_query_arg(array('ebook_key' => $ebook_order['ebook_key'][0], 'action' => $action_name, 'md5_nonce' => @$ebook_order['md5_nonce'][0]),get_permalink($ebook_order['ebook'][0]));
 	$link = remove_query_arg('p',$link);
+	if ($action_name == 'download_free') {
+		$link = add_query_arg(array('p' => $ebook_order['ebook'][0]),$link);
+	}
 	$post_id = 11;
 	$post = get_post($ebook_order['ebook'][0]);
 	$slug = $post->post_name;
@@ -497,7 +508,7 @@ function humanFileSize($size,$unit="") {
 }
 function ebook_store( $atts ){
 	include('locale.php');
-	
+	//wp_enqueue_script( 'ebook_store_settings', plugins_url( '/js/ebook_store_settings.js' , __FILE__ ), array(), '1.0.0', true );
 	$post_id = get_the_ID();
 	if (@$_REQUEST['ebook_key'] != false && @$_REQUEST['action'] == 'thank_you') {
 		$content = get_option('thankyou_page',true);
@@ -516,7 +527,7 @@ function ebook_store( $atts ){
 		return apply_filters('the_content',$content);
 	}
 	$items = '';
-	$args = array( 'post_type' => 'ebook', 'posts_per_page' => -1, 'p' => $atts['ebook_id'] );
+	$args = array( 'post_type' => 'ebook', 'posts_per_page' => -1, 'p' => @$atts['ebook_id'] );
 	$loop = new WP_Query( $args );
 	while ( $loop->have_posts() ) : $loop->the_post();
 	/*the_title();
@@ -525,8 +536,8 @@ function ebook_store( $atts ){
 	echo '</div>';*/
 	$ebook = get_post_meta(get_the_ID(), 'ebook', true);
 	$ebook_key = md5(NONCE_KEY . get_the_ID() . $ebook['ebook_price'] . mt_rand(1,100000));
-	 
-	$custom = get_the_ID() . '|' . md5(NONCE_KEY . get_the_ID() . @number_format($ebook['ebook_price'], 2, '.', ','));
+	$md5_nonce = md5(mt_rand(1,9999) . NONCE_KEY . get_the_ID() . @number_format($ebook['ebook_price'], 2, '.', ','));
+	$custom = get_the_ID() . '|' . $md5_nonce;
 	 
 	$c = new Currencies();
 	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment', true);
@@ -550,23 +561,40 @@ function ebook_store( $atts ){
 	$authors = @implode(", ", $authors);
 	/* div class front, where is it?*/
 	$md5rand = md5(rand(1,10000) . microtime());
+	$buyNowLinkText = $locale['buy'] . ' (' . $c->getSymbol(get_option('paypal_currency','USD')) . @number_format($ebook['ebook_price'],2) . ')';
+	$buyNowLinkOnClick = 'document.getElementById(\'' . $md5rand . '\').submit(); return false;';
+	if ($ebook['ebook_price'] == 0 || $ebook['donate_or_download'] == 'free') {
+		$buyNowLinkText = $locale['download'];
+		$buyNowLinkOnClick = "window.location = '" .  ebook_download_link(array('ebook' => array(0 => get_the_ID()), 'ebook_key' => array(0 => $ebook_key), 'md5_nonce' => array(0 => $md5_nonce)),1) . "'";
+	} else if ($ebook['ebook_price'] == 0 || $ebook['donate_or_download'] == 'donate') {
+		$buyNowLinkText = $locale['download'];
+		$ebook['ebook_price'] = 0;
+	}
+	if (get_option('formEnabled') == 1) {
+		$buyNowLinkOnClick = "ebook_store_popup(function () {" . $buyNowLinkOnClick . "}, this);";
+		wp_enqueue_script( 'ebook_store_site_modal', plugins_url( '/js/jquery.easyModal.js' , __FILE__ ), array(), '1.0.0', true );
+		wp_enqueue_script( 'ebook_store_site', plugins_url( '/js/ebook_store_site.js' , __FILE__ ), array(), '1.0.0', true );
+		wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );
+		wp_enqueue_style( 'ebookstorestylesheet' );
+	}
 
-	$items .= '
+	$items .= '<div id="ebook_formData" class="ebook_formData"></div>
             <figure>
                             <div class="perspective"><div class="book" data-book="book-' . get_the_ID() . '"><div class="cover"><div data-dd="dd" class="front" style="background: url(' . @$cover['url'] . ');"></div><div class="inner inner-left"></div></div><div class="inner inner-right"></div></div></div><div class="buttons">
                             		<a href="#" style="display:none;">Look inside</a><a href="#" class="details_link">' . $locale['details'] . '</a><a target="_blank" href="' . (@$preview['url'] != '' ? $preview['url'] : '" style="display:none;') . '" class="">' . $locale['preview'] . '</a>
-<a class="ebook_buy_link" href="#" onClick="document.getElementById(\'' . $md5rand . '\').submit(); return false;">' . $locale['buy'] . ' (' . $c->getSymbol(get_option('paypal_currency','USD')) . @number_format($ebook['ebook_price'],2) . ')</a>
+<a class="ebook_buy_link" data-md5_nonce="' . $md5_nonce . '" href="#" onClick="' . $buyNowLinkOnClick . '">' . $buyNowLinkText . '</a>
 <form method="post" id="' . $md5rand . '" name="dmp_order_form" action="https://www' . (get_option('paypal_sandbox') != '' ? '.sandbox' : '') . '.paypal.com/cgi-bin/webscr">
 		<input type="hidden" name="rm" value="0">
 		<input type="hidden" name="discount_rate" value="0">
 		<input type="hidden" name="cmd" value="_xclick">
 		<input type="hidden" name="charset" value="utf-8">
+		<input type="hidden" name="md5_nonce" value="' . $md5_nonce . '">
 		<input type="hidden" name="lc" value="' . get_option('paypal_language') . '">
 		<input type="hidden" name="no_shipping" value="' . get_option('ebook_store_require_shipping') . '">
 		<input type="hidden" name="button_subtype" value="products">
 		<input type="hidden" name="return" value="' . add_query_arg(array('ebook_key' => $ebook_key, 'action' => 'thank_you'),get_permalink(get_option('ebook_store_checkout_page'))) . '">
 		<input type="hidden" name="cancel_return" value="' . add_query_arg(array('ebook_key' => $ebook_key, 'action' => 'cancel'),get_permalink(get_option('ebook_store_cancel_page'))) . '">
-		<input type="hidden" name="notify_url" value="' . add_query_arg(array('task' => 'ipn','ebook_key' => $ebook_key), home_url('/')) . '">
+		<input type="hidden" name="notify_url" value="' . add_query_arg(array('task' => 'ipn','ebook_key' => $ebook_key, 'md5_nonce' => $md5_nonce), home_url('/')) . '">
 		<input type="hidden" name="item_name" value="' . get_the_title() . '">
 		<input type="hidden" name="item_number" value="1">
 		<input type="hidden" name="tax_rate" value="' . get_option('vat_percent') . '">
@@ -605,58 +633,6 @@ background: url(' . @$side['url'] . ');
 <div id="bookshelf" class="bookshelf">
                     ' . $items . '
                 </div>
-
-        <div class="bb-custom-wrapper" id="book-1">
-            <div class="bb-bookblock">
-                <div class="bb-item">
-                    <div class="bb-custom-side page-layout-3">
-                        <div>
-                            <h3>Portraits</h3>
-                            <p>Photography (1999 &ndash; 2013)</p>
-                        </div>
-                    </div>
-                    <div class="bb-custom-side page-layout-3">
-                    </div>
-                </div>
-                <div class="bb-item">
-                    <div class="bb-custom-side page-layout-1">
-                        <h3>
-                            Chapter 9 <span>Nomadic Lifestyle</span>
-                        </h3>
-                    </div>
-                    <div class="bb-custom-side page-layout-1">
-                        <p>Candy canes lollipop macaroon marshmallow gummi bears tiramisu. Dessert croissant cupcake candy canes. Bear claw faworki faworki lemon drops. Faworki marzipan sugar plum jelly-o marzipan cookie.</p>
-                    </div>
-                </div>
-                <div class="bb-item">
-                    <div class="bb-custom-side page-layout-2">
-                        <div>
-                            <h3>Aa</h3>
-                            <p>Faworki marzipan sugar plum jelly-o marzipan. Soufflé tootsie roll jelly beans. Sweet icing croissant dessert bear claw. Brownie dessert cheesecake danish jelly pudding bear claw soufflé.</p>
-                        </div>
-                        <div>
-                            <h3>Bb</h3>
-                            <p>Faworki marzipan sugar plum jelly-o marzipan. Soufflé tootsie roll jelly beans. Sweet icing croissant dessert bear claw. Brownie dessert cheesecake danish jelly pudding bear claw soufflé.</p>
-                        </div>
-                    </div>
-                    <div class="bb-custom-side page-layout-2">
-                        <div>
-                            <h3>Cc</h3>
-                            <p>Faworki marzipan sugar plum jelly-o marzipan. Soufflé tootsie roll jelly beans. Sweet icing croissant dessert bear claw. Brownie dessert cheesecake danish jelly pudding bear claw soufflé.</p>
-                        </div>
-                        <div>
-                            <h3>Dd</h3>
-                            <p>Faworki marzipan sugar plum jelly-o marzipan. Soufflé tootsie roll jelly beans. Sweet icing croissant dessert bear claw. Brownie dessert cheesecake danish jelly pudding bear claw soufflé.</p>
-                        </div>
-                    </div>
-                </div>
-            </div><!-- /bb-bookblock -->
-            <nav>
-                <a href="#" class="bb-nav-prev">Previous</a>
-                <a href="#" class="bb-nav-next">Next</a>
-                <a href="#" class="bb-nav-close">Close</a>
-            </nav>
-        </div><!-- /bb-custom-wrapper -->
 
         <script src="' . plugins_url('js/bookblock.min.js',__FILE__) . '"></script>
         <script src="' . plugins_url('js/classie.js',__FILE__) . '"></script>
@@ -746,12 +722,13 @@ class Currencies {
 function order_columns($columns)
 {
 	$columns = array(
-	//		'cb'	 	=> '<input type="checkbox" />',
+			'cb'	 	=> '<input type="checkbox" />',
 	//		'thumbnail'	=>	'Thumbnail',
 			'title' 	=> 'Buyer',
 			'paypal'	=> 'PayPal',
 			//		'featured' 	=> 'Featured',
 			'product'	=>	'Product',
+			'formData'	=>	'Form Data',
 			'amount'	=>	'Amount',
 			'country'	=> 	'Country',
 			'shipping_address'	=> 	'Shipping Address',
@@ -800,7 +777,20 @@ function order_custom_columns($column)
 		case 'downloadlink':
 			$downloadlink = get_post_meta($post->ID,'downloadlink',true);
 			echo ($downloadlink != '' ? "<a href=\"$downloadlink\">Download</a>" : 'N/A');
-		break;
+			break;
+		case 'formData':
+			$md5_nonce = get_post_meta($post->ID,'md5_nonce',true);
+			$data = get_post_meta($post->ID,'formData',true);		
+			$data = json_decode($data);
+			if ($data) {
+			unset($data->md5_nonce);
+				foreach ($data as $key => $value) {
+					echo "<b>$key</b>: $value<br />";
+				}
+
+			}
+			
+			break;
 	}
 }
 function ebook_readfile_chunked( $file, $retbytes = TRUE ) {
@@ -1159,7 +1149,55 @@ function ebook_process_download() {
 		ebook_count_download($order_id);
 		die();
 		endwhile;
-	} 
+	} else if ($_REQUEST['action'] == 'download_free') {
+		$id = (int)$_REQUEST['p'];
+		$loop = new WP_Query( array ( 'post_type' => 'ebook', 'id' => $id ) );
+		while ( $loop->have_posts() ) : $loop->the_post();
+			$attachment = get_post_meta(get_the_ID(),'ebook_wp_custom_attachment');
+			$ebook = get_post_meta(get_the_ID(), 'ebook', true);
+			//wp_die(print_r($ebook));
+			if ($ebook['ebook_price'] == 0) {
+				$ebook['donate_or_download'] = 'free';
+			}
+			if ($ebook['ebook_price'] > 0 && $ebook['donate_or_download'] != 'free') {
+				wp_die('You are trying to download a file that is not free.');
+			}
+			$requested_file = $attachment[0]['file'];
+			$ctype = ebook_get_file_ctype(pathinfo($requested_file,PATHINFO_EXTENSION));
+			$gmt_timestamp = get_post_time('U');
+			//insert order
+			$my_post = array(
+			  'post_title'    => 'Free Download',
+			  'post_type'	  => 'ebook_order',
+			  'post_status'   => 'publish',
+			  'post_author'   => 1,
+			  'post_category' => array(8,39));
+			$post_id = wp_insert_post( $my_post, $wp_error );
+			$md5_nonce = strip_tags($_REQUEST['md5_nonce']);
+			$formData = ebook_store_get_form($md5_nonce);
+			$formData = json_encode($formData);
+			$item_name = get_the_title((int)$_REQUEST['p']);
+			//die($item_name);
+			update_post_meta($post_id,'ebook_key',$md5_nonce);
+			update_post_meta($post_id,'downloads',1);
+			update_post_meta($post_id,'formData',wp_slash($formData));
+			update_post_meta($post_id,'downloadlink',"http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
+			update_post_meta($post_id,'ebook',(int)$_REQUEST['p']);
+			update_post_meta($post_id,'item_name',$item_name);
+			update_post_meta($post_id,'payer_email','Not Applicable');
+			update_post_meta($post_id,'mc_gross',0);
+			update_post_meta($post_id,'mc_fee',0);
+			//get_post_meta($post->ID,'item_name',true)
+			//insert order end
+			header("Robots: none");
+			header("Content-Type: " . $ctype . "");
+			header("Content-Description: File Transfer");
+			header("Content-Disposition: attachment; filename=\"" . apply_filters( 'ebook_requested_file_name', basename( $requested_file ) ) . "\";");
+			header("Content-Transfer-Encoding: binary");
+			ebook_readfile_chunked($requested_file);
+		endwhile;
+		die();
+	}
 }
 function ebook_count_download($order_id) {
 	$downloads = get_post_meta($order_id,'downloads',true);
@@ -1231,7 +1269,7 @@ function ebook_encrypt_pdf() {
 		$pdf->SetProtection(array(), $password);
 	}
 	$pdf->Output($destfile, 'F');
-	update_post_meta($ebook_email_delivery['order']['order_id'],'encrypted_pdf',$destfile);
+	update_post_meta($ebook_email_delivery['order']['order_id'],'encrypted_pdf',wp_slash($destfile));
 	//make sure enc file is attached
 	$ebook_email_delivery['attachment'][0]['file'] = $destfile;
 	$isPdf = true;
@@ -1317,7 +1355,6 @@ function ebook_store_columns_output( $column, $post_id ) {
 </style>
 			";
 		}
-
 		
 		echo $cover;
 
@@ -1330,4 +1367,32 @@ function ebook_store_columns_output( $column, $post_id ) {
 
 function ebook_store_pre_get_shortlink( $false, $post_id ) {
      return 'ebook' === get_post_type( $post_id ) ? '' : $false;
+}
+function ebook_mime_types($mime_types){
+    $mime_types['epub'] = 'application/epub+zip'; //Adding svg extension
+    $mime_types['mobi'] = 'application/octet-stream'; //Adding photoshop files
+    return $mime_types;
+}
+function ebook_store_formContent() {
+	if ($_REQUEST['task'] == 'formContent') {
+		echo get_option('formContent');
+		die();
+	} else if ($_REQUEST['task'] == 'ebook_store_form_input') {
+		ebook_store_save_form($_POST['md5_nonce'],$_POST);
+	}
+}
+function ebook_store_save_form($md5_nonce, $data) {
+foreach ($data as $k => $v) {
+			@$json[$k] = $v; 
+		}
+		$json = json_encode($json);
+		file_put_contents(get_temp_dir() . '/ebook_store_form_' . $md5_nonce , $json);
+}
+function ebook_store_get_form($md5_nonce){ 
+	@$formData = file_get_contents(get_temp_dir() . '/ebook_store_form_' . $md5_nonce);
+	if ($formData) {
+		return json_decode($formData);
+	} else {
+		return false;
+	}
 }

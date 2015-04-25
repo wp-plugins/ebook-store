@@ -2,6 +2,9 @@
 // create custom plugin settings menu
 add_action('admin_menu', 'ebook_create_menu');
 
+wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );
+        wp_enqueue_style( 'ebookstorestylesheet' ); 
+
 function ebook_create_menu() {
 
 	//create new top-level menu
@@ -42,6 +45,8 @@ function register_ebook_store_settings() {
     register_setting( 'ebook-settings-group', 'ebook_store_require_shipping' );
     register_setting( 'ebook-settings-group', 'buyer_info' );
     register_setting( 'ebook-settings-group', 'buyer_info_text' );
+    register_setting( 'ebook-settings-group', 'formContent' );
+    register_setting( 'ebook-settings-group', 'formEnabled' );
 }
 
 
@@ -115,7 +120,7 @@ wp_enqueue_script( 'ebook_store_settings', plugins_url( '/js/ebook_store_setting
     <table class="form-table">
         <tr valign="top">
         <th scope="row">PayPal account</th>
-        <td><input type="text" name="paypal_account" value="<?php echo get_option('paypal_account'); ?>" placeholder="Your@PayPal" /></td>
+        <td><input type="text" name="paypal_account" value="<?php echo get_option('paypal_account'); ?>" placeholder="Your@PayPal" /><span class="description ebook_store_warning">Please note that you need to enable PayPal IPN in your PayPal.com profile. That's under Profile > My selling tools > Instant payment notifications. In the IPN url field enter your website address.</span></td>
         </tr>
         
         <tr>
@@ -250,10 +255,15 @@ wp_dropdown_pages($args);
         </th>
         <td><input type="checkbox" name="buyer_info"  value="1" <?php echo (get_option('buyer_info') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">This feature will print/watermark the buyer's information in the header of each page.</span></td>
         </tr>
+        <tr valign="top" class="goPro">
+        <th scope="row">Fill a form upon order
+        </th>
+        <td><input type="checkbox" name="formEnabled"  value="1" <?php echo (get_option('formEnabled') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">If this feature is enabled the user will be asked to fill in a form with more details, the form you can edit as you wish with your own html editor and paste the code on this page's section with the form content.</span></td>
+        </tr>
         
         <tr valign="top" class="goPro">
         <th scope="row">Buyer info text</th>
-        <td><input type="text" size="130" value="<?php 
+        <td><input name="buyer_info_text" type="text" size="130" value="<?php 
         echo get_option('buyer_info_text',$op->buyer_info_text);
         ?>" /></td>
         </tr>
@@ -311,6 +321,14 @@ wp_dropdown_pages($args);
         <td>Subject:<br /><input type="text" name="email_delivery_subject" value="<?php echo get_option('email_delivery_subject',$op->email_delivery_subject); ?>" /><?php 
         $editor_id = 'email_delivery_text';
         wp_editor( get_option('email_delivery_text',$op->email_delivery_text), $editor_id );
+        ?></td>
+        </tr>
+        <tr valign="top">
+        <th scope="row">Form Content</th>
+        <td>
+        <?php
+        $editor_id = 'formContent';
+        wp_editor( get_option('formContent',$op->formContent), $editor_id );
         ?></td>
         </tr>
         

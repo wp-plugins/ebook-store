@@ -2,7 +2,7 @@
 
 class QRPDF extends FPDI_Protection {
 
-	function Header() {
+	function Footer() {
 
 		global $ebook_png_path, $pdfHeaderText;
 
@@ -24,8 +24,8 @@ class QRPDF extends FPDI_Protection {
 	if (get_option('buyer_info')) {
 			$this->SetFont('Arial');
 			$this->SetTextColor(255, 0, 0);
-			$this->SetXY(0.3, 0.3);
-
+			$this->SetXY(0.2, 0.2);
+			$this->SetFontSize(10);
 			$this->Write(0, $pdfHeaderText);
 		}
 	}
