@@ -3,7 +3,7 @@ Contributors: motov.net
 Tags: paypal, epub, paid downloads, sell, files, ebook, ebooks, paid, downloads, qr code, sell ebook, pdf drm, watermark, ecnrypt, pdf, mobi, sell ebooks
 Requires at least: 3.5.1
 Tested up to: 4.2.1
-Stable tag: 3.9
+Stable tag: 4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,6 +68,14 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 4.0 =
+* Fixed order replication.
+* Fixed loosing Pro functionality when updating.
+* Fixed Automated PDF format / size detection.
+* Fixed More PDF DRM encryption functions added, owner / master PDF and user password.
+* Added Japanase Translation.
+* Added self diagnostic for corrupted files.
 
 = 3.8 =
 * Fixes regarding the display of prices in backend and made the watermark in header font smaller.

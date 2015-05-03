@@ -326,14 +326,17 @@ class pdf_parser
             $xrefStreamObjDec = $this->_readValue($this->_c);
 
             if (is_array($xrefStreamObjDec) && isset($xrefStreamObjDec[0]) && $xrefStreamObjDec[0] == self::TYPE_OBJDEC) {
+                mail(get_option( 'admin_email' ), 'eBook store for WordPress - Wrong PDF format' . $this->filename, 'Please reupload the file in PDF 1.5 (Acrobat 1.5 format) or disable PDF encryption! Filename: ' .$this->filename);
                 throw new Exception(
                     sprintf(
                         'This document (%s) probably uses a compression technique which is not supported by the ' .
                         'free parser shipped with FPDI. (See https://www.setasign.com/fpdi-pdf-parser for more details)',
                         $this->filename
                     )
+                    
                 );
             } else {
+                mail(get_option( 'admin_email' ), 'eBook store for WordPress - Unable to parse PDF' . $this->filename, 'Please reupload the file in PDF 1.5 (Acrobat 1.5 format) or disable PDF encryption! Filename: ' .$this->filename);
                 throw new Exception('Unable to find xref table.');
             }
         }

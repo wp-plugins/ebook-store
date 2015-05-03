@@ -32,7 +32,6 @@ function register_ebook_store_settings() {
 	register_setting( 'ebook-settings-group', 'paypal_sandbox' );
 	register_setting( 'ebook-settings-group', 'paypal_verify_transactions' );
 	register_setting( 'ebook-settings-group', 'encrypt_pdf' );
-	register_setting( 'ebook-settings-group', 'allow_pdf_printing' );
 	register_setting( 'ebook-settings-group', 'qr_code' );
 	register_setting( 'ebook-settings-group', 'pdf_orientation' );
 	register_setting( 'ebook-settings-group', 'vat_percent' );
@@ -47,6 +46,12 @@ function register_ebook_store_settings() {
     register_setting( 'ebook-settings-group', 'buyer_info_text' );
     register_setting( 'ebook-settings-group', 'formContent' );
     register_setting( 'ebook-settings-group', 'formEnabled' );
+    register_setting( 'ebook-settings-group', 'ebook_store_license_key' );
+    register_setting( 'ebook-settings-group', 'ebook_store_owner_password' );
+    register_setting( 'ebook-settings-group', 'disable_annot-forms' );
+    register_setting( 'ebook-settings-group', 'disable_pdf_copy' );
+    register_setting( 'ebook-settings-group', 'disable_pdf_modify' );
+    register_setting( 'ebook-settings-group', 'disable_pdf_printing' );
 }
 
 
@@ -111,6 +116,11 @@ $ppcurencies = array('USD' => 'US Dollar',
 wp_enqueue_script( 'ebook_store_settings', plugins_url( '/js/ebook_store_settings.js' , __FILE__ ), array(), '1.0.0', true );
 
 	?>
+<script>
+<?php
+echo "var ebook_store_license_key = '" . get_option('ebook_store_license_key') . "'";
+?>
+</script>
 <div class="wrap">
 <h2>eBook Store - Settings</h2>
 
@@ -120,7 +130,7 @@ wp_enqueue_script( 'ebook_store_settings', plugins_url( '/js/ebook_store_setting
     <table class="form-table">
         <tr valign="top">
         <th scope="row">PayPal account</th>
-        <td><input type="text" name="paypal_account" value="<?php echo get_option('paypal_account'); ?>" placeholder="Your@PayPal" /><span class="description ebook_store_warning">Please note that you need to enable PayPal IPN in your PayPal.com profile. That's under Profile > My selling tools > Instant payment notifications. In the IPN url field enter your website address.</span></td>
+        <td><input type="text" name="paypal_account" value="<?php echo get_option('paypal_account'); ?>" placeholder="Your@PayPal" /><br /><br /><span class="description ebook_store_warning">Please enable PayPal IPN in your PayPal account. That's under Profile > My selling tools > Instant payment notifications. In the IPN url field enter your website address.</span></td>
         </tr>
         
         <tr>
@@ -232,18 +242,50 @@ wp_dropdown_pages($args);
         <td><select name="ebook_store_require_shipping"><option value="0"<?php echo (get_option('ebook_store_require_shipping') == '0' ? ' selected="selected"' : ''); ?>>Optional</option><option value="1"<?php echo (get_option('ebook_store_require_shipping') == '1' ? ' selected="selected"' : ''); ?>>Do not require address</option><option value="2"<?php echo (get_option('ebook_store_require_shipping') == '2' ? ' selected="selected"' : ''); ?>>Require Address</option></select></td>
         </tr>
 
+        <tr valign="top">
+        <th scope="row">License key</th>
+        <td><input type="text" name="ebook_store_license_key" style="width:250px;" value="<?php echo get_option('ebook_store_license_key',$op->ebook_store_license_key); ?>" placeholder="(Pro only) your@paypal.email" /><span class="description">If you purchased the full version of the plugin, just fill in your PayPal email used when ordering and you will be able to unlock the pro features and keep them active after updating.</span></td>
+        </tr>
+
+        
+        <tr valign="top" class="goPro">
+        <th colspan="2" scope="row"> </th>
+        </tr>
+
+        <tr valign="top" class="goPro">
+        <th colspan="2" scope="row"><h2>PDF Protection features (require Encryption to be turned on)</h2></th>
+        </tr>
+
         <tr valign="top" class="goPro">
         <th scope="row">Encrypt PDF Files</span></th>
         <td><input type="checkbox" name="encrypt_pdf"  value="1" <?php echo (get_option('encrypt_pdf') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">This will option will enable encrypted delivery, both via email as attachment (if enabled) and via site download. The password of the encrypted PDF file is always the buyer's PayPal email address.</span></td>
         </tr>
-        
-             
         <tr valign="top" class="goPro">
-        <th scope="row">Allow PDF Printing</span></th>
-        <td><input type="checkbox" name="allow_pdf_printing"  value="1"  <?php echo (get_option('allow_pdf_printing') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">If you want your encrypted PDF files to be printed, enable this option. Otherwise the PDF files you sell will only be readable on a computer, and can not be printed.</span></td>
+        <th scope="row">PDF Master (Owner) password</th>
+        <td><input name="ebook_store_owner_password" type="text" size="130" value="<?php 
+        echo get_option('ebook_store_owner_password',$op->ebook_store_owner_password);
+        ?>" placeholder="If left empty unique password will be generated for each file upon order confirmation." /></td>
         </tr>
-        
-             
+        <tr valign="top" class="goPro">
+        <th scope="row">PDF User Password</th>
+        <td>User password is always the PayPal email address of the buyer used when buying the PDF ebook.</td>
+        </tr>
+        <tr valign="top" class="goPro">
+        <th scope="row">Disable PDF Printing</span></th>
+        <td><input type="checkbox" name="disable_pdf_printing"  value="1"  <?php echo (get_option('disable_pdf_printing') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">This feature will disable printing for the PDF files you're selling.</span></td>
+        </tr>
+        <tr valign="top" class="goPro">
+        <th scope="row">Disable Copy/Paste from PDF</span></th>
+        <td><input type="checkbox" name="disable_pdf_copy"  value="1"  <?php echo (get_option('disable_pdf_copy') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">This feature will disable copying from the PDF files you're selling.</span></td>
+        </tr>
+        <tr valign="top" class="goPro">
+        <th scope="row">Disable PDF Modification</span></th>
+        <td><input type="checkbox" name="disable_pdf_modify"  value="1"  <?php echo (get_option('disable_pdf_modify') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">This feature will disable modifications for the PDF files you're selling.</span></td>
+        </tr>
+        <tr valign="top" class="goPro">
+        <th scope="row">Disable Annotation forms</span></th>
+        <td><input type="checkbox" name="disable_annot-forms"  value="1"  <?php echo (get_option('disable_annot-forms') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">This feature will disable printing for the PDF files you're selling.</span></td>
+        </tr>
         <tr valign="top" class="goPro">
         <th scope="row">QR Code
         <span class="description">(<a href="http://shopfiles.com/samples/protected_cv.pdf" target="_blank">see sample</a>, PDF only)</span></th>
@@ -251,27 +293,32 @@ wp_dropdown_pages($args);
         </tr>
 
         <tr valign="top" class="goPro">
-        <th scope="row">Buyer Info in header
+        <th scope="row">Buyer Info in PDF header
         </th>
         <td><input type="checkbox" name="buyer_info"  value="1" <?php echo (get_option('buyer_info') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">This feature will print/watermark the buyer's information in the header of each page.</span></td>
         </tr>
-        <tr valign="top" class="goPro">
-        <th scope="row">Fill a form upon order
-        </th>
-        <td><input type="checkbox" name="formEnabled"  value="1" <?php echo (get_option('formEnabled') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">If this feature is enabled the user will be asked to fill in a form with more details, the form you can edit as you wish with your own html editor and paste the code on this page's section with the form content.</span></td>
-        </tr>
-        
         <tr valign="top" class="goPro">
         <th scope="row">Buyer info text</th>
         <td><input name="buyer_info_text" type="text" size="130" value="<?php 
         echo get_option('buyer_info_text',$op->buyer_info_text);
         ?>" /></td>
         </tr>
-        
-        <tr valign="top" class="goPro">
+        <!-- <tr valign="top" class="goPro">
         <th scope="row">PDF Orientation</span></th>
         <td><select name="pdf_orientation"><option value="portrait"<?php echo (get_option('pdf_orientation') == 'portrait' ? ' selected="selected"' : ''); ?>>Portrait</option><option value="landscape"<?php echo (get_option('pdf_orientation') == 'landscape' ? ' selected="selected"' : ''); ?>>Landscape</option></select></td>
+        </tr> -->
+
+        <tr valign="top" class="goPro">
+        <th colspan="2" scope="row"> </th>
         </tr>
+
+        <tr valign="top" class="goPro">
+        <th scope="row">Fill a form upon order
+        </th>
+        <td><input type="checkbox" name="formEnabled"  value="1" <?php echo (get_option('formEnabled') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">If this feature is enabled the user will be asked to fill in a form with more details, the form you can edit as you wish with your own html editor and paste the code on this page's section with the form content.</span></td>
+        </tr>
+        
+        
         <tr valign="top" class="goPro">
 
         <tr valign="top" class="goPro">
@@ -280,8 +327,8 @@ wp_dropdown_pages($args);
         </tr>
 
         <tr valign="top" class="goPro">
-
-        </tr>                
+        <th colspan="2" scope="row"> </th>
+        </tr>
         
         <tr valign="top">
         <th scope="row">Link Expiration</th>
@@ -340,4 +387,14 @@ wp_dropdown_pages($args);
 
 </form>
 </div>
+<!--Start of Zopim Live Chat Script-->
+<script type="text/javascript">
+window.$zopim||(function(d,s){var z=$zopim=function(c){z._.push(c)},$=z.s=
+d.createElement(s),e=d.getElementsByTagName(s)[0];z.set=function(o){z.set.
+_.push(o)};z._=[];z.set._=[];$.async=!0;$.setAttribute('charset','utf-8');
+$.src='//v2.zopim.com/?pJJOUNrd3F2XicGCyKN5BGmHdzK4VVuA';z.t=+new Date;$.
+type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
+</script>
+<!--End of Zopim Live Chat Script-->
+
 <?php } ?>

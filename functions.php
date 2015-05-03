@@ -245,10 +245,11 @@ function ebook_wp_custom_attachment() {
 	}
 	@$ebook_publishers .= '<option value="' . get_the_ID() . '"' . $selected . '>' . get_the_title() . '</option>';
 	endwhile;
+	$html .= "<script>var ebook_store_license_key = '" . get_option('ebook_store_license_key') . "'; </script>";
 	$html .= '<div style="float:none; clear:both; overflow:auto;"><div class="ebookSeller50Percent">
 			<h1 style="line-height:1.5em;">After you have uploaded the book, please copy the code from the "eBook Embed Code Box", and paste it inside the article or page where you want the eBook ordering form to appear.</h1>';
 	$html .= '<p class="">Supported file types in free version are: <b style="color:green;">PDF</b> and <b style="color:green;">ZIP</b>, to use <b style="color:red;">EPUB</b> and <b style="color:red;">MOBI</b> you can get the full version from here: <a target="_blank" href="https://www.shopfiles.com/index.php/products/wordpress-ebook-store">Upgrade eBook Store</a>, no data will be lost upon upgrade.<br /><br />Upload your eBook file here' . (@$img['url'] != '' ? '<br class="clear">Currently uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">' . @basename($img['url']) . '</a>' : '<br />Ebook file is still not uploaded.');
-	$html .= '<br /><input type="file" id="ebook_wp_custom_attachment" name="ebook_wp_custom_attachment" value="" size="25">';
+	$html .= '<br /><input type="file" accept=".pdf,.zip" id="ebook_wp_custom_attachment_ebook" name="ebook_wp_custom_attachment" value="" size="25">';
 	$html .= '</p>';
 	$html .= '<p class="">Preview of the book' . (@$preview['url'] != '' ? '<br class="clear">Currently uploaded: <a href="' . @$preview['url'] . '">' . @basename($preview['url']) . '</a>' : '<br />Preview file is still not uploaded.');
 	$html .= '<br /><input type="file" id="ebook_wp_custom_attachment_preview" name="ebook_wp_custom_attachment_preview" value="" size="25">';
@@ -537,7 +538,8 @@ function ebook_store( $atts ){
 	$ebook = get_post_meta(get_the_ID(), 'ebook', true);
 	$ebook_key = md5(NONCE_KEY . get_the_ID() . $ebook['ebook_price'] . mt_rand(1,100000));
 	$md5_nonce = md5(mt_rand(1,9999) . NONCE_KEY . get_the_ID() . @number_format($ebook['ebook_price'], 2, '.', ','));
-	$custom = get_the_ID() . '|' . $md5_nonce;
+	//$custom = get_the_ID() . '|' . $md5_nonce;
+	$custom = get_the_ID() . '|' . md5(NONCE_KEY . get_the_ID() . number_format($ebook['ebook_price'], 2, '.', ','));
 	 
 	$c = new Currencies();
 	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment', true);
@@ -1219,7 +1221,9 @@ function ebook_email_delivery($post_id) {
 	}
 	$ebook_email_delivery['text'] = apply_filters('the_content',$ebook_email_delivery['text']);
 	add_filter( 'wp_mail_content_type', 'ebook_set_content_type' );
-	wp_mail($ebook_email_delivery['to'],$ebook_email_delivery['subject'], $ebook_email_delivery['text'],null,$ebook_email_delivery['attachment'][0]['file']);
+	if (get_option('email_delivery') == 1) {
+		wp_mail($ebook_email_delivery['to'],$ebook_email_delivery['subject'], $ebook_email_delivery['text'],null,$ebook_email_delivery['attachment'][0]['file']);
+	}
 }
 function ebook_set_content_type( $content_type ){
 	return 'text/html';
@@ -1246,28 +1250,63 @@ function ebook_encrypt_pdf() {
 	//
 	$file = $attachment[0]['file'];
 	$password = $_REQUEST['payer_email'];
+	$owner_password = get_option('ebook_store_owner_password');
+
 	mkdir(plugin_dir_path( __FILE__ ) . 'cache/' . md5($path), 0755, true);
 	$destfile = plugin_dir_path( __FILE__ ) . 'cache/' . md5($path) . '/' . basename($file);
 	//error_log('encrypting ' . $file);
-	$pdf = new QRPDF();
-	//TODO: Get source size
-	if (get_option('pdf_orientation') == 'portrait') {
-		$pdf->FPDF('P', 'in', array('8.27','11.69'));
-	} else {
-		$pdf->FPDF('P', 'in', array('11.69','8.27'));
-	}
-	$pagecount = $pdf->setSourceFile($file);
+
+
+
+			$pdf = new QRPDF();
+			$pdf->FPDF('P', 'in', 'a4');
+			$pagecount = $pdf->setSourceFile($file);
+			$tplidx = $pdf->importPage(1);
+			$size = $pdf->getTemplateSize($tplidx);
+			$pdfOrientation = "P";
+			if ($size['w'] > $size['h']) { $pdfOrientation = 'L'; }
+			$pdf->FPDF($pdfOrientation, 'in', array($size['w'],$size['h']));
+			$pagecount = $pdf->setSourceFile($file);
+
+
+
+
+
+	// $pdf = new QRPDF();
+	// //TODO: Get source size
+	// if (get_option('pdf_orientation') == 'portrait') {
+	// 	$pdf->FPDF('P', 'in', array('8.27','11.69'));
+	// } else {
+	// 	$pdf->FPDF('P', 'in', array('11.69','8.27'));
+	// }
+	// $pagecount = $pdf->setSourceFile($file);
 	for ($loop = 1; $loop <= $pagecount; $loop++) {
 		$tplidx = $pdf->importPage($loop);
 		$pdf->addPage();
 		//error_log('page ' . $loop);
 		$pdf->useTemplate($tplidx);
 	}
-	if (get_option('allow_pdf_printing')) {
-		$pdf->SetProtection(array('print' => 'print'), $password, "");
-	} else {
-		$pdf->SetProtection(array(), $password);
+
+	$protection = array();
+	$protection['print'] = 'print';
+	$protection['annot-forms'] = 'annot-forms';
+	$protection['print'] = 'copy';
+	$protection['modify'] = 'modify';
+
+	if (get_option('disable_pdf_printing') == 1) {
+		unset($protection['print']);
 	}
+	if (get_option('disable_annot-forms') == 1) {
+		unset($protection['annot-forms']);	
+	}
+	if (get_option('disable_pdf_copy') == 1) {
+		unset($protection['copy']);
+	}
+	if (get_option('disable_pdf_modify') == 1) {
+		unset($protection['modify']);
+	}
+	$pdf->SetProtection((array)$protection, $password, $owner_password);
+	
 	$pdf->Output($destfile, 'F');
 	update_post_meta($ebook_email_delivery['order']['order_id'],'encrypted_pdf',wp_slash($destfile));
 	//make sure enc file is attached
@@ -1387,6 +1426,8 @@ foreach ($data as $k => $v) {
 		}
 		$json = json_encode($json);
 		file_put_contents(get_temp_dir() . '/ebook_store_form_' . $md5_nonce , $json);
+		header("HTTP/1.1 200 OK");
+		die();
 }
 function ebook_store_get_form($md5_nonce){ 
 	@$formData = file_get_contents(get_temp_dir() . '/ebook_store_form_' . $md5_nonce);

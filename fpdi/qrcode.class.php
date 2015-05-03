@@ -8,17 +8,7 @@ class QRPDF extends FPDI_Protection {
 
 		if (get_option('qr_code')) {
 
-			//$this->Image($ebook_png_path,7.4,10.83,0.77,0.77);
-
-			if (get_option('pdf_orientation') == 'portrait') {
-
-				$this->Image($ebook_png_path,7.4,10.83,0.77,0.77);
-
-			} else {
-
-				$this->Image($ebook_png_path,10.83,7.4,0.77,0.77);
-
-			}
+			$this->Image($ebook_png_path,$this->w - 0.77,$this->h - 0.77,0.77,0.77);
 
 		}
 	if (get_option('buyer_info')) {

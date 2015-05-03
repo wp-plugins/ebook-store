@@ -5,7 +5,7 @@ Plugin URI: https://www.shopfiles.com/index.php/products/wordpress-ebook-store
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
 Author URI:https://www.shopfiles.com/index.php/products/wordpress-ebook-store
-Version: 3.9
+Version: 4.0
 License: GPLv2
 */
 
@@ -13,11 +13,18 @@ include_once('functions.php');
 include_once('class_qswpoptions.php');
 include_once('ebook_options.php');
 
-add_action('init', 'check_ipn');
 add_action('init', 'ebook_store_formContent');
+add_action('init', 'check_ipn');
+
 
 function check_ipn() {
 	if ($_REQUEST['task'] == 'ipn') {
+		$ebook_key = preg_replace("/[^a-zA-Z0-9]+/", "", $_REQUEST['ebook_key']);
+		//if order with such ebook key / order key exists, drop order.
+		if (ebook_get_order('ebook_key', $ebook_key)) {
+			return false;
+		}
+
 		global $ebook_email_delivery;
 		include_once 'payment_gateways/paypal/ipnlistener.php';
 		$listener = new IpnListener();
@@ -31,6 +38,7 @@ function check_ipn() {
 			die($e->getMessage());
 			exit(0);
 		}
+
 		if ($verified) {
 			$my_post = array(
 			  'post_title'    => $_REQUEST['first_name'] . ' ' . $_REQUEST['last_name'],
@@ -46,13 +54,16 @@ function check_ipn() {
 			}
 			$mc_gross = number_format($mc_gross, 2, '.', ',');
 			$ebook = get_post_meta($custom[0], 'ebook', true);
-			if (md5(NONCE_KEY . $custom[0] . $mc_gross) == $custom[1] || $ebook['donate_or_download'] == 'donate') {
+			$md5 = md5(NONCE_KEY . $custom[0] . $mc_gross);
+			//error_log("$md5 $custom[1] " . NONCE_KEY . $custom[0] . $mc_gross);
+			if ($md5 == $custom[1] || $ebook['donate_or_download'] == 'donate') {
+				
 				$post_id = wp_insert_post( $my_post, $wp_error );
 				foreach ($_REQUEST as $k => $v) {
 					update_post_meta($post_id, $k, $v);
 					@$order[$k] = $v;
 				}
-				$ebook_key = preg_replace("/[^a-zA-Z0-9]+/", "", $_REQUEST['ebook_key']);
+				
 				$order['order_id'] = $post_id;
 				$order['password'] = $_REQUEST['payer_email'];
 				$formData = ebook_store_get_form($_REQUEST['md5_nonce']);
@@ -62,7 +73,7 @@ function check_ipn() {
 				$order['downloadlink'] = ebook_download_link($ebook_order);
 				update_post_meta($post_id,'ebook_key',$ebook_key);
 				update_post_meta($post_id,'downloads',0);
-				update_post_meta($post_id,'mc_gross',0);
+				update_post_meta($post_id,'mc_gross',$mc_gross);
 				update_post_meta($post_id,'formData',wp_slash($formData));
 				update_post_meta($post_id,'downloadlink',$order['downloadlink']);
 				update_post_meta($post_id,'ebook',$custom[0]);
@@ -75,11 +86,11 @@ function check_ipn() {
 				$fileExt = pathinfo($attachment[0]['file'],PATHINFO_EXTENSION);
 				if ($fileExt == 'pdf' && get_option('encrypt_pdf')) {
 					add_action( 'init', 'ebook_encrypt_pdf', 99 );
-					error_log('ecnrypt pdf added to init');
+					//error_log('ecnrypt pdf added to init');
 				}
 				
 				add_action( 'init', 'ebook_email_delivery', 100);
-				error_log('ebook_email_delivery added to plugins_loaded');
+				//error_log('ebook_email_delivery added to plugins_loaded');
 				//array('to' => $_REQUEST['payer_email'], 'subject' => get_option('email_delivery_subject'), 'text' => 'teeext', 'file' => $attachment[0]['file'])
 			} else {
 				mail(get_option( 'admin_email' ), 'eBook store for WordPress - Possible fraud attempt ', $listener->getTextReport());
@@ -122,6 +133,6 @@ add_action( 'admin_head-post-new.php', 'ebook_admin_css' );
 add_action( 'admin_head-post.php', 'ebook_admin_css' );
 add_filter( 'manage_edit-ebook_columns', 'ebook_store_set_columns' ) ;
 add_action( 'manage_ebook_posts_custom_column', 'ebook_store_columns_output', 10, 2 );
-//add_filter('upload_mimes', 'ebook_mime_types', 1, 1);
+add_filter('upload_mimes', 'ebook_mime_types', 1, 1);
 
 ?>
