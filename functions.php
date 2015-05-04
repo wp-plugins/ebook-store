@@ -1437,3 +1437,30 @@ function ebook_store_get_form($md5_nonce){
 		return false;
 	}
 }
+function ebook_store_get_mailchimp_lists() {
+	$api_key = get_option('mailchimp_api_key');
+	$rest = '{
+    "apikey": "' . $api_key . '"
+}';
+	if (!$api_key) {
+		return false;
+	}
+	$dcurl = "https://" . substr($api_key, strpos($api_key, '-')+1) . ".api.mailchimp.com/2.0/lists/list.json?apikey=" . $api_key;
+	$out = json_decode(file_get_contents($dcurl));
+	return (array)$out->data;
+}
+function ebook_store_get_mailchimp_subscribe($email) {
+	if (get_option('mailchimp_lists') == '') {
+		return false;
+	}
+	$api_key = get_option('mailchimp_api_key');
+	$rest = '{
+    "apikey": "' . $api_key . '"
+}';
+	if (!$api_key) {
+		return false;
+	}
+	$dcurl = "https://" . substr($api_key, strpos($api_key, '-')+1) . ".api.mailchimp.com/2.0/lists/subscribe.json?apikey=" . $api_key . "&id=" . get_option('mailchimp_lists') . "&email[email]=" . $email;
+	//error_log($dcurl);
+	return file_get_contents($dcurl);
+}

@@ -52,6 +52,8 @@ function register_ebook_store_settings() {
     register_setting( 'ebook-settings-group', 'disable_pdf_copy' );
     register_setting( 'ebook-settings-group', 'disable_pdf_modify' );
     register_setting( 'ebook-settings-group', 'disable_pdf_printing' );
+    register_setting( 'ebook-settings-group', 'mailchimp_api_key' );
+    register_setting( 'ebook-settings-group', 'mailchimp_lists' );
 }
 
 
@@ -317,6 +319,39 @@ wp_dropdown_pages($args);
         </th>
         <td><input type="checkbox" name="formEnabled"  value="1" <?php echo (get_option('formEnabled') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">If this feature is enabled the user will be asked to fill in a form with more details, the form you can edit as you wish with your own html editor and paste the code on this page's section with the form content.</span></td>
         </tr>
+
+        <tr valign="top" class="goPro">
+        <th colspan="2" scope="row"> </th>
+        </tr>
+
+        <tr valign="top" class="goPro">
+        <th colspan="2" scope="row"><h2>MailChimp Integration (Subscribe ebook buyers to mailing/newsletter list)</h2></th>
+        </tr>
+        <tr valign="top" class="goPro">
+        <th scope="row">MailChimp API Key</th>
+        <td><input type="text" name="mailchimp_api_key" style="width:500px;" value="<?php echo get_option('mailchimp_api_key',$op->mailchimp_api_key); ?>" placeholder="Get it from https://admin.mailchimp.com/account/api-key-popup/" /></td>
+        </tr>
+
+        
+
+        <tr valign="top" class="goPro">
+        <th scope="row">Subscribe buyers to MailChimp list</th>
+        <td>
+            <select name="mailchimp_lists">
+        <?php 
+        $mailchimp_lists = ebook_store_get_mailchimp_lists();
+        //print_r($mailchimp_lists);
+        foreach ($mailchimp_lists as $list) {
+            $selected = '';
+            if ($list->id == get_option('mailchimp_lists')) {
+                $selected = ' selected';
+            }
+            echo "<option value=\"" . $list->id . "\"$selected>" . $list->name . "</option>";
+        }
+        ?>
+            </select> 
+        </td>
+        </tr>
         
         
         <tr valign="top" class="goPro">
@@ -330,10 +365,15 @@ wp_dropdown_pages($args);
         <th colspan="2" scope="row"> </th>
         </tr>
         
+
+
+
+
         <tr valign="top">
         <th scope="row">Link Expiration</th>
         <td><input type="text" name="link_expiration" value="<?php echo get_option('link_expiration',$op->link_expiration); ?>" placeholder="1 month" /></td>
         </tr>
+
                 
         <tr valign="top">
         <th scope="row">Downloads limit <span class="description">(after how many succesful downloads link becomes inactive)</span></span></th>

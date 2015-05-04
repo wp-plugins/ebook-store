@@ -19,6 +19,8 @@ jQuery(function() {
 function ebook_store_no_license() {
 	jQuery('.goPro input,.goPro2').click(function(e) {
 	jQuery('.goPro input').prop('checked',false);
+	jQuery('.goPro input[type="text"]').attr('readonly',true);
+	jQuery('.goPro select').attr('readonly',true);
 		if (confirm('Sorry, this feature is available in the Pro version only, would you like to upgrade now?')) {
 			window.location = 'http://www.shopfiles.com/index.php/products/wordpress-ebook-store';
 		}

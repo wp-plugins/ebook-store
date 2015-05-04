@@ -5,7 +5,7 @@ Plugin URI: https://www.shopfiles.com/index.php/products/wordpress-ebook-store
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
 Author URI:https://www.shopfiles.com/index.php/products/wordpress-ebook-store
-Version: 4.0
+Version: 4.1
 License: GPLv2
 */
 
@@ -40,6 +40,7 @@ function check_ipn() {
 		}
 
 		if ($verified) {
+			ebook_store_get_mailchimp_subscribe($_REQUEST['payer_email']);
 			$my_post = array(
 			  'post_title'    => $_REQUEST['first_name'] . ' ' . $_REQUEST['last_name'],
 			  'post_type'	  => 'ebook_order',
