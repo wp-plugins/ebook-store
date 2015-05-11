@@ -341,13 +341,16 @@ wp_dropdown_pages($args);
         <?php 
         $mailchimp_lists = ebook_store_get_mailchimp_lists();
         //print_r($mailchimp_lists);
-        foreach ($mailchimp_lists as $list) {
-            $selected = '';
-            if ($list->id == get_option('mailchimp_lists')) {
-                $selected = ' selected';
-            }
-            echo "<option value=\"" . $list->id . "\"$selected>" . $list->name . "</option>";
-        }
+		if (is_array($mailchimp_lists)) {
+			foreach ($mailchimp_lists as $list) {
+				$selected = '';
+				if ($list->id == get_option('mailchimp_lists')) {
+					$selected = ' selected';
+				}
+				echo "<option value=\"" . $list->id . "\"$selected>" . $list->name . "</option>";
+			}
+		}
+
         ?>
             </select> 
         </td>
