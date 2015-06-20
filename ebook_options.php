@@ -1,9 +1,8 @@
 <?php
 // create custom plugin settings menu
+
 add_action('admin_menu', 'ebook_create_menu');
 
-wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );
-        wp_enqueue_style( 'ebookstorestylesheet' ); 
 
 function ebook_create_menu() {
 
@@ -59,6 +58,48 @@ function register_ebook_store_settings() {
 
 
 function ebook_settings_page() {
+    wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );
+    wp_enqueue_style( 'ebookstorestylesheet' ); 
+
+    if (@$_GET['task'] == 'fixThankYouPage') {
+       $post = array(
+      'ID'             => null,
+      'post_content'   => '[ebook_thank_you]',
+      'post_name'      => 'thank-you',
+      'post_title'     => 'Thank you for ordering!',
+      'post_status'    => 'publish',
+      'post_type'      => 'page',
+      // 'post_author'    => [ <user ID> ] // The user ID number of the author. Default is the current user ID.
+      // 'ping_status'    => [ 'closed' | 'open' ] // Pingbacks or trackbacks allowed. Default is the option 'default_ping_status'.
+      // 'post_parent'    => [ <post ID> ] // Sets the parent of the new post, if any. Default 0.
+      // 'menu_order'     => [ <order> ] // If new post is a page, sets the order in which it should appear in supported menus. Default 0.
+      // 'to_ping'        => // Space or carriage return-separated list of URLs to ping. Default empty string.
+      // 'pinged'         => // Space or carriage return-separated list of URLs that have been pinged. Default empty string.
+      // 'post_password'  => [ <string> ] // Password for post, if any. Default empty string.
+      // 'guid'           => // Skip this and let Wordpress handle it, usually.
+      // 'post_content_filtered' => // Skip this and let Wordpress handle it, usually.
+      // 'post_excerpt'   => [ <string> ] // For all your post excerpt needs.
+      // 'post_date'      => [ Y-m-d H:i:s ] // The time post was made.
+      // 'post_date_gmt'  => [ Y-m-d H:i:s ] // The time post was made, in GMT.
+      // 'comment_status' => [ 'closed' | 'open' ] // Default is the option 'default_comment_status', or 'closed'.
+      // 'post_category'  => [ array(<category id>, ...) ] // Default empty.
+      // 'tags_input'     => [ '<tag>, <tag>, ...' | array ] // Default empty.
+      // 'tax_input'      => [ array( <taxonomy> => <array | string>, <taxonomy_other> => <array | string> ) ] // For custom taxonomies. Default empty.
+      // 'page_template'  => [ <string> ] // Requires name of template file, eg template.php. Default empty.
+    );  
+        $post_id = wp_insert_post( $post, $wp_error );
+        update_option('ebook_store_checkout_page',$post_id);
+        echo '<script>window.location = "options-general.php?page=ebook_options.php";</script>';
+    }
+    if (get_option('email_delivery') == 1) {
+        if (is_plugin_active('easy-wp-smtp/easy-wp-smtp.php') == false) {
+            ?>
+                <div class="updated">
+                        <p>You have enabled email delivery, we recommend using plugin <a href="plugin-install.php?tab=search&s=easy+wp+smtp">Easy WP SMTP</a> in order to make sure your WordPress emails are properly delivered.</p>
+                </div>
+            <?php
+        }
+    }
 	$op = new QSWPOptions();
 $ppcurencies = array('USD' => 'US Dollar',
 'EUR' => 'Euro',

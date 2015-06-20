@@ -1,9 +1,9 @@
 === Ebook Store  ===
 Contributors: motov.net
-Tags: paypal, epub, paid downloads, sell, files, ebook, ebooks, paid, downloads, qr code, sell ebook, pdf drm, watermark, ecnrypt, pdf, mobi, sell ebooks
+Tags: paypal, epub, paid downloads, sell, files, ebook, ebooks, paid, downloads, qr code, sell ebook, pdf drm, watermark, ecnrypt, pdf, mobi, sell ebooks, donate, free
 Requires at least: 3.5.1
 Tested up to: 4.2.2
-Stable tag: 4.2
+Stable tag: 4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,6 +68,15 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 4.3 =
+* Automatically create thank you page.
+* Blank paypal account warning.
+* Master and user password PDF DRM function
+* Fill a form upon order
+* Auto resize cover on upload
+* Return url fix when no return page selected
+* eBook embedding box/dialog now available on post/page editing screen
 
 = 4.1 =
 * Added MailChimp support, you can now subscribe buyers to MailChimp lists!

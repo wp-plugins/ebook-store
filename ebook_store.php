@@ -5,7 +5,7 @@ Plugin URI: https://www.shopfiles.com/index.php/products/wordpress-ebook-store
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
 Author URI:https://www.shopfiles.com/index.php/products/wordpress-ebook-store
-Version: 4.2
+Version: 4.3
 License: GPLv2
 */
 
@@ -18,7 +18,7 @@ add_action('init', 'check_ipn');
 
 
 function check_ipn() {
-	if ($_REQUEST['task'] == 'ipn') {
+	if (@$_REQUEST['task'] == 'ipn') {
 		$ebook_key = preg_replace("/[^a-zA-Z0-9]+/", "", $_REQUEST['ebook_key']);
 		//if order with such ebook key / order key exists, drop order.
 		if (ebook_get_order('ebook_key', $ebook_key)) {
@@ -119,10 +119,16 @@ add_shortcode( 'ebook_thank_you', 'ebook_store' );
 register_activation_hook( __FILE__, 'ebook_activate' );
 register_deactivation_hook( __FILE__, 'ebook_deactivate' );
 if (defined('PHP_VERSlON') == false) define('PHP_VERSlON',1);
+add_action('init',function() {
 wp_enqueue_style( 'ebookstorestylesheet' );
-wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );
+wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );	
+});
+
 if (get_option('ebook_store_checkout_page') == 0) {
 	add_action( 'admin_notices', 'ebook_store_admin_notice' );	
+}
+if (get_option('paypal_account') == '') {
+	add_action( 'admin_notices', 'ebook_store_admin_notice_paypal' );	
 }
 
 //3.3

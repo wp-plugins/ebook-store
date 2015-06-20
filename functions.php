@@ -153,22 +153,36 @@ function ebook_add_custom_meta_boxes() {
 	'eBook Details',
 	'ebook_wp_custom_attachment',
 	'ebook',
-	'side'
+	'advanced'
 			);
+	add_meta_box(
+	'ebook_wp_embed_ebook',
+	'eBook Store - Click on eBook to embed it',
+	'ebook_wp_embed_ebook',
+	'post',
+	'advanced'
+	);
+	add_meta_box(
+	'ebook_wp_embed_ebook',
+	'eBook Store - Click eBook to Embed',
+	'ebook_wp_embed_ebook',
+	'page',
+	'advanced'
+	);
 			// Define the custom attachment for posts
-			add_meta_box(
-			'ebook_code_box',
-			'eBook Embed Code Box',
-			'ebook_code_box',
-			'ebook',
-			'side'
-					);
+			// add_meta_box(
+			// 'ebook_code_box',
+			// 'eBook Embed Code Box',
+			// 'ebook_code_box',
+			// 'ebook',
+			// 'side'
+			// );
 					add_meta_box(
 					'ebook_order_box',
 					'Order details',
 					'ebook_order_box',
 					'ebook_order',
-					'side'
+					'advanced'
 							);
 }
 
@@ -214,7 +228,7 @@ function ebook_code_box() {
 	if ($_REQUEST['post'] > 0 && $_REQUEST['post'] != $post_id) {
 		$post_id = $_REQUEST['post'];
 	}
-	echo '<input id="ebook_code" onClick="this.select()" readonly type="text" size="30" value=\'[ebook_store ebook_id="' . $post_id . '"]\' />';
+	echo '<input id="ebook_code" onClick="this.select()" readonly type="text" size="29" value=\'[ebook_store ebook_id="' . $post_id . '"]\' /> Copy and paste this code in your post or page where you want the order form to appear.';
 }
 function ebook_wp_custom_attachment() {
 	wp_enqueue_script('jquery-ui-datepicker');
@@ -245,40 +259,54 @@ function ebook_wp_custom_attachment() {
 	}
 	@$ebook_publishers .= '<option value="' . get_the_ID() . '"' . $selected . '>' . get_the_title() . '</option>';
 	endwhile;
-	$html .= "<script>var ebook_store_license_key = '" . get_option('ebook_store_license_key') . "'; </script>";
+	$upgradeText = '';
+	@$html .= "<script>var ebook_store_license_key = '" . get_option('ebook_store_license_key') . "'; </script>";
 	$html .= '<div style="float:none; clear:both; overflow:auto;"><div class="ebookSeller50Percent">
-			<h1 style="line-height:1.5em;">After you have uploaded the book, please copy the code from the "eBook Embed Code Box", and paste it inside the article or page where you want the eBook ordering form to appear.</h1>';
-	$html .= '<p class="">Supported file types in free version are: <b style="color:green;">PDF</b> and <b style="color:green;">ZIP</b>, to use <b style="color:red;">EPUB</b> and <b style="color:red;">MOBI</b> you can get the full version from here: <a target="_blank" href="https://www.shopfiles.com/index.php/products/wordpress-ebook-store">Upgrade eBook Store</a>, no data will be lost upon upgrade.<br /><br />Upload your eBook file here' . (@$img['url'] != '' ? '<br class="clear">Currently uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">' . @basename($img['url']) . '</a>' : '<br />Ebook file is still not uploaded.');
+			';
+	// $html = '<h1 style="line-height:1.5em;">
+	// 		To make the order form show up in your post or page, use the shortcode from the eBook Embed Code Box.
+	// 		</h1>';
+	$html .= 'Copy and paste this code in your post or page where you want the order form to appear
+	<br />
+	<input id="ebook_code" onClick="this.select()" readonly type="text" size="29" value=\'[ebook_store ebook_id="' . get_the_ID() . '"]\' />';
+	if (get_option('ebook_store_license_key') == '') {
+		$upgradeText = 'Supported file types in free version are: <b style="color:green;">PDF</b> and <b style="color:green;">ZIP</b>, to use <b style="color:red;">EPUB</b> and <b style="color:red;">MOBI</b> you can get the full version from here: <a target="_blank" href="https://www.shopfiles.com/index.php/products/wordpress-ebook-store">Upgrade eBook Store</a>, no data will be lost upon upgrade.<br />';
+	}
+	$html .= '<p class="">' . $upgradeText . '
+
+	<br /><b>Ebook File<span style="color:red; font-size:15px;"> * </span></b>' . (@$img['url'] != '' ? '<br class="clear">Uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">
+		' . @basename($img['url']) . '</a>' : '<br />Ebook file missing, please upload it here!');
 	$html .= '<br /><input type="file" accept=".pdf,.zip" id="ebook_wp_custom_attachment_ebook" name="ebook_wp_custom_attachment" value="" size="25">';
 	$html .= '</p>';
-	$html .= '<p class="">Preview of the book' . (@$preview['url'] != '' ? '<br class="clear">Currently uploaded: <a href="' . @$preview['url'] . '">' . @basename($preview['url']) . '</a>' : '<br />Preview file is still not uploaded.');
+	$html .= '<p><b>Cover Image</b> (optional)<span class="description"> (180x260 recommended)</span>' . (@$img_cover['url'] != '' ? '<br class="clear">Currently uploaded: <a href="' . @$img_cover['url'] . '">' . @basename($img_cover['url']) . '</a>' : '<br />Cover image is missing.');
+	$html .= '<br /><input name="ebook_wp_custom_attachment_cover" type="file"></p>';
+	$html .= '<p class=""><b>eBook Preview</b> (optional)' . (@$preview['url'] != '' ? '<br class="clear">Uploaded: <a href="' . @$preview['url'] . '">' . @basename($preview['url']) . '</a>' : '<br />Preview file is not uploaded.');
 	$html .= '<br /><input type="file" id="ebook_wp_custom_attachment_preview" name="ebook_wp_custom_attachment_preview" value="" size="25">';
 	$html .= '</p>';
-	$html .= '<p><b>Cover Image</b><span class="description"> (180x260 recommended)</span>' . (@$img_cover['url'] != '' ? '<br class="clear">Currently uploaded: <a href="' . @$img_cover['url'] . '">' . @basename($img_cover['url']) . '</a>' : '<br />Cover image is missing.');
-	$html .= '<br /><input name="ebook_wp_custom_attachment_cover" type="file"></p>';
-	$html .= '<p><b>Side Image</b><span class="description"> (20x260 recommended)</span>' . (@$img_side_photo['url'] != '' ? '<br class="clear">Currently uploaded: <a href="' . @$img_side_photo['url'] . '">' . @basename($img_side_photo['url']) . '</a>' : '<br />Side image is missing.');
+
+	$html .= '<p><b>Side Image</b> (optional)<span class="description"> (20x260 recommended)</span>' . (@$img_side_photo['url'] != '' ? '<br class="clear">Currently uploaded: <a href="' . @$img_side_photo['url'] . '">' . @basename($img_side_photo['url']) . '</a>' : '<br />Side image is missing.');
 	$html .= '<br /><input name="ebook_wp_custom_attachment_side_photo" type="file"></p>';
 	$html .= '
 <form action="" method="get">
-<p>Author<br /><select name="ebook[ebook_author][]" multiple>
+<p>Author (optional)<br /><select name="ebook[ebook_author][]" multiple>
 <option value="0">None</option>
-' . $ebook_authors . '
+' . @$ebook_authors . '
 </select></p>
 </div>
 <div class="ebookSeller50Percent">
-<p>Publisher<br /><select name="ebook[ebook_publisher][]" multiple>
+<p>Publisher (optional)<br /><select name="ebook[ebook_publisher][]" multiple>
 <option value="0">None</option>
-' . $ebook_publishers . '
+' . @$ebook_publishers . '
 </select></p>
-<p>Date<br /><input id="ebook_date" name="ebook[ebook_date]" type="text" value="' . @$ebook['ebook_date'] . '"></p>
-<p>Pages<br /><input name="ebook[ebook_pages]" type="number" value="' . @$ebook['ebook_pages'] . '"></p>
+<p>Date (optional)<br /><input id="ebook_date" name="ebook[ebook_date]" type="text" value="' . @$ebook['ebook_date'] . '"></p>
+<p>Pages (optional)<br /><input name="ebook[ebook_pages]" type="number" value="' . @$ebook['ebook_pages'] . '"></p>
 <!--
 <p><input name="ebook[ebook_qrcode]" type="checkbox" value="1" . ' . (@$ebook['ebook_qrcode'] != '' ? 'checked' : '') . '>QR Code Watermark <span class="description">(<a href="http://shopfiles.com/samples/protected_cv.pdf" target="_blank">see sample</a>, PDF only)</span></p>
 <p><input name="ebook[ebook_set_password]" type="checkbox" value="1" . ' . (@$ebook['ebook_set_password'] != '' ? 'checked' : '') . '>Set password <span class="description">(buyer\'s email, PDF only)</span></p>
 <p><input name="ebook[ebook_disable_printing]" type="checkbox" value="1" . ' . (@$ebook['ebook_disable_printing'] != '' ? 'checked' : '') . '>Disable printing <span class="description">(PDF only)</span></p>
 <p><input name="ebook[ebook_emailDelivery]" type="checkbox" value="1" . ' . (@$ebook['ebook_emailDelivery'] != '' ? 'checked' : '') . '>Send a copy to buyer\'s email</span></p>
 -->
-<p>Price<br /><input name="ebook[ebook_price]" placeholder="0.00" type="number" step="any" value="' . @$ebook['ebook_price'] . '"></p>
+<p>Price <span style="color:red; font-size:15px;"> * </span><br /><input name="ebook[ebook_price]" placeholder="0.00" min="0.01" type="number" step="any" value="' . (@$ebook['ebook_price'] > 0 ? @$ebook['ebook_price'] : 0.01) . '"></p>
 <label><p class=""><input name="ebook[donate_or_download]" type="radio" value="paid" ' . (@$ebook['donate_or_download'] == 'paid' || @$ebook['donate_or_download'] == '' ? 'checked' : '') . '>Paid download <SMALL class="description">Order is placed trough PayPal and the user is returned to the site for downloading the product. Email delivery routine will be triggered.</SMALL></p></label>
 <label><p class="goPro2"><input class="goPro2" name="ebook[donate_or_download]" type="radio" value="free" ' . (@$ebook['donate_or_download'] == 'free' ? 'checked' : '') . '>Allow free download <small class="description">User is not sent to PayPal, download starts directly.</small></p></label>
 <label><p class="goPro2"><input class="goPro2" name="ebook[donate_or_download]" type="radio" value="donate" ' . (@$ebook['donate_or_download'] == 'donate' ? 'checked' : '') . '>Donate to download <small class="description">User can set a price for the ebook once it lands on PayPal.</small></p></label>
@@ -447,18 +475,33 @@ function save_custom_meta_data($id) {
 	} // end if
 	//cover photo
 	if(!empty($_FILES['ebook_wp_custom_attachment_cover']['name'])) {
-
+		$filename = $_FILES['ebook_wp_custom_attachment_cover']['tmp_name'];
 		// Setup the array of supported file types. In this case, it's just PDF.
 		$supported_types = array('image/jpeg','image/gif','image/png','image/svg+xml');
 			
 		// Get the file type of the upload
 		$arr_file_type = wp_check_filetype(basename($_FILES['ebook_wp_custom_attachment_cover']['name']));
 		$uploaded_type = $arr_file_type['type'];
-
+		$image = @imagecreatefromjpeg($filename);
+		if (!$image) {
+			$image = imagecreatefrompng($filename);
+		}
 		// Check if the type is supported. If not, throw an error.
 		if(1) {
 
 			// Use the WordPress API to upload the file
+			$img_tmp_name = $_FILES['ebook_wp_custom_attachment_cover']['tmp_name'];
+			list($width, $height) = getimagesize($img_tmp_name);
+			if ($width != 180 || $height != 260) {
+				$image_p = imagecreatetruecolor(180, 260);
+				$image = @imagecreatefromjpeg($img_tmp_name);
+				if (!$image) {
+					$image = imagecreatefrompng($img_tmp_name);
+				}
+				imagecopyresampled($image_p, $image, 0, 0, 0, 0, 180, 260, $width, $height);
+				imagejpeg($image_p, $img_tmp_name,100);
+
+			}
 			$upload = wp_upload_bits($_FILES['ebook_wp_custom_attachment_cover']['name'], null, file_get_contents($_FILES['ebook_wp_custom_attachment_cover']['tmp_name']));
 
 			if(isset($upload['error']) && $upload['error'] != 0) {
@@ -539,21 +582,24 @@ function ebook_store( $atts ){
 	$ebook_key = md5(NONCE_KEY . get_the_ID() . $ebook['ebook_price'] . mt_rand(1,100000));
 	$md5_nonce = md5(mt_rand(1,9999) . NONCE_KEY . get_the_ID() . @number_format($ebook['ebook_price'], 2, '.', ','));
 	//$custom = get_the_ID() . '|' . $md5_nonce;
-	$custom = get_the_ID() . '|' . md5(NONCE_KEY . get_the_ID() . number_format($ebook['ebook_price'], 2, '.', ','));
+	$custom = get_the_ID() . '|' . md5(NONCE_KEY . get_the_ID() . @number_format($ebook['ebook_price'], 2, '.', ','));
 	 
 	$c = new Currencies();
 	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment', true);
 	$preview = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment_preview', true);
 	$cover = get_post_meta(get_the_ID(),'ebook_wp_custom_attachment_cover',true);
 	$side = get_post_meta(get_the_ID(),'ebook_wp_custom_attachment_side_photo',true);
+	if (!$side) {
+		$side = $cover;
+	}
 	//style="background-url:(' . $side['url'] . ');"
-	if (is_array($ebook['ebook_publisher'])) {
+	if (is_array(@$ebook['ebook_publisher'])) {
 		$publishers = array();
 		foreach ($ebook['ebook_publisher'] as $p => $pp) {
 			$publishers[] = get_the_title($pp);
 		}		
 	}
-	if (is_array($ebook['ebook_author'])) {
+	if (is_array(@$ebook['ebook_author'])) {
 		$authors = array();
 		foreach ($ebook['ebook_author'] as $p => $pp) {
 			$authors[] = get_the_title($pp);
@@ -562,6 +608,10 @@ function ebook_store( $atts ){
 	$publishers = @implode(", ", $publishers);
 	$authors = @implode(", ", $authors);
 	/* div class front, where is it?*/
+	if ($img == '') {
+		echo "<h3>The eBook embedded in this page is missing the eBook file, please edit the ebook and upload a file to remove this message.</h3>";
+		echo "Click <a href=\"" . home_url() . "/wp-admin/post.php?post=" . get_the_ID() . "&action=edit\">here</a> to open the eBook editor.";
+	}
 	$md5rand = md5(rand(1,10000) . microtime());
 	$buyNowLinkText = $locale['buy'] . ' (' . $c->getSymbol(get_option('paypal_currency','USD')) . @number_format($ebook['ebook_price'],2) . ')';
 	$buyNowLinkOnClick = 'document.getElementById(\'' . $md5rand . '\').submit(); return false;';
@@ -572,6 +622,9 @@ function ebook_store( $atts ){
 		$buyNowLinkText = $locale['download'];
 		$ebook['ebook_price'] = 0;
 	}
+	if ($img == '') {
+		$buyNowLinkOnClick = 'alert(\'There is no ebook file uploaded. Please upload a file first in the eBook Store plugin.\');';
+	}
 	if (get_option('formEnabled') == 1) {
 		$buyNowLinkOnClick = "ebook_store_popup(function () {" . $buyNowLinkOnClick . "}, this);";
 		wp_enqueue_script( 'ebook_store_site_modal', plugins_url( '/js/jquery.easyModal.js' , __FILE__ ), array(), '1.0.0', true );
@@ -579,7 +632,10 @@ function ebook_store( $atts ){
 		wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );
 		wp_enqueue_style( 'ebookstorestylesheet' );
 	}
-
+	$checkoutPage = get_option('ebook_store_checkout_page');
+	if (!$checkoutPage) {
+		$checkoutPage = $post_id;
+	}
 	$items .= '<div id="ebook_formData" class="ebook_formData"></div>
             <figure>
                             <div class="perspective"><div class="book" data-book="book-' . get_the_ID() . '"><div class="cover"><div data-dd="dd" class="front" style="background: url(' . @$cover['url'] . ');"></div><div class="inner inner-left"></div></div><div class="inner inner-right"></div></div></div><div class="buttons">
@@ -594,7 +650,7 @@ function ebook_store( $atts ){
 		<input type="hidden" name="lc" value="' . get_option('paypal_language') . '">
 		<input type="hidden" name="no_shipping" value="' . get_option('ebook_store_require_shipping') . '">
 		<input type="hidden" name="button_subtype" value="products">
-		<input type="hidden" name="return" value="' . add_query_arg(array('ebook_key' => $ebook_key, 'action' => 'thank_you'),get_permalink(get_option('ebook_store_checkout_page'))) . '">
+		<input type="hidden" name="return" value="' . add_query_arg(array('ebook_key' => $ebook_key, 'action' => 'thank_you'),get_permalink($checkoutPage)) . '">
 		<input type="hidden" name="cancel_return" value="' . add_query_arg(array('ebook_key' => $ebook_key, 'action' => 'cancel'),get_permalink(get_option('ebook_store_cancel_page'))) . '">
 		<input type="hidden" name="notify_url" value="' . add_query_arg(array('task' => 'ipn','ebook_key' => $ebook_key, 'md5_nonce' => $md5_nonce), home_url('/')) . '">
 		<input type="hidden" name="item_name" value="' . get_the_title() . '">
@@ -1119,7 +1175,7 @@ function ebook_get_file_ctype( $extension ) {
 	return apply_filters( 'ebook_file_ctype', $ctype );
 }
 function ebook_process_download() {
-	if ($_REQUEST['ebook_key'] != false && $_REQUEST['action'] == 'download') {
+	if (@$_REQUEST['ebook_key'] != false && $_REQUEST['action'] == 'download') {
 		if( function_exists( 'apache_setenv' ) ) @apache_setenv('no-gzip', 1);
 		@ini_set( 'zlib.output_compression', 'Off' );
 		nocache_headers();
@@ -1151,20 +1207,22 @@ function ebook_process_download() {
 		ebook_count_download($order_id);
 		die();
 		endwhile;
-	} else if ($_REQUEST['action'] == 'download_free') {
+	} else if (@$_REQUEST['action'] == 'download_free') {
 		$id = (int)$_REQUEST['p'];
 		$loop = new WP_Query( array ( 'post_type' => 'ebook', 'id' => $id ) );
 		while ( $loop->have_posts() ) : $loop->the_post();
-			$attachment = get_post_meta(get_the_ID(),'ebook_wp_custom_attachment');
+			$attachment = get_post_meta($id,'ebook_wp_custom_attachment');
 			$ebook = get_post_meta(get_the_ID(), 'ebook', true);
-			//wp_die(print_r($ebook));
+
 			if ($ebook['ebook_price'] == 0) {
 				$ebook['donate_or_download'] = 'free';
 			}
 			if ($ebook['ebook_price'] > 0 && $ebook['donate_or_download'] != 'free') {
 				wp_die('You are trying to download a file that is not free.');
 			}
+
 			$requested_file = $attachment[0]['file'];
+
 			$ctype = ebook_get_file_ctype(pathinfo($requested_file,PATHINFO_EXTENSION));
 			$gmt_timestamp = get_post_time('U');
 			//insert order
@@ -1174,7 +1232,7 @@ function ebook_process_download() {
 			  'post_status'   => 'publish',
 			  'post_author'   => 1,
 			  'post_category' => array(8,39));
-			$post_id = wp_insert_post( $my_post, $wp_error );
+			$post_id = wp_insert_post( $my_post, @$wp_error );
 			$md5_nonce = strip_tags($_REQUEST['md5_nonce']);
 			$formData = ebook_store_get_form($md5_nonce);
 			$formData = json_encode($formData);
@@ -1229,7 +1287,9 @@ function ebook_set_content_type( $content_type ){
 	return 'text/html';
 }
 function ebook_attachment($post_id) {
-	return get_post_meta($post_id,'ebook_wp_custom_attachment');
+	if (get_option('attach_files') == 1) {
+		return get_post_meta($post_id,'ebook_wp_custom_attachment');
+	}
 }
 function ebook_encrypt_pdf() {
 	global $ebook_email_delivery, $ebook_qr_text, $ebook_png_path, $ebook_pngname, $attachment, $pdfHeaderText;
@@ -1316,7 +1376,17 @@ function ebook_encrypt_pdf() {
 function ebook_store_admin_notice() {
     ?>
     <div class="updated">
-        <p><?php _e( 'You need to create a "Thank you" landing page with the text/shortcode <input type="text" size=20 value="[ebook_thank_you]" />, where you want the "Thank You" page content to appear, then select that page in eBook Store options under Settings menu.', 'ebooks-store' ); ?></p>
+        <p><?php _e( 'You need to create a "Thank you" landing page with the text/shortcode <input type="text" size=20 value="[ebook_thank_you]" />, where you want the "Thank You" page content to appear, then select that page in eBook Store options under Settings menu.
+<br />
+<p class="submit"><input type="button" name="button" id="button" class="button button-primary" value="Fix automatically" onClick="window.location = \'options-general.php?page=ebook_options.php&task=fixThankYouPage\';"></p>
+        ', 'ebooks-store' ); ?></p>
+    </div>
+    <?php
+}
+function ebook_store_admin_notice_paypal() {
+    ?>
+    <div class="updated">
+        <p><?php _e( 'You have not yet filled in your <b>PayPal account</b>. Please do that in <a href="options-general.php?page=ebook_options.php">Settings > eBook Store</a> in order to be able to receive payments.', 'ebooks-store' ); ?></p>
     </div>
     <?php
 }
@@ -1333,6 +1403,9 @@ function ebook_store_set_messages($messages) {
 	return $messages;
 }
 function ebook_store_remove_parmelink( $return ) {
+	if (@$post_id == false) {
+		$post_id = get_the_ID();
+	}
 	if ('ebook' === get_post_type( $post_id )) {
 		$return = '';
 	}
@@ -1386,7 +1459,7 @@ function ebook_store_columns_output( $column, $post_id ) {
 			$cover['url'] = plugins_url( 'images/no-cover.png', dirname(__FILE__) );	
 			$cover = "N/A";
 		} else {
-			$cover = "<img src=\"{$cover[url]}\" style=\"max-width:100px;\" />
+			$cover = "<img src=\"{$cover['url']}\" style=\"max-width:100px;\" />
 <style>
 .column-cover {
 	width:120px;
@@ -1413,10 +1486,10 @@ function ebook_mime_types($mime_types){
     return $mime_types;
 }
 function ebook_store_formContent() {
-	if ($_REQUEST['task'] == 'formContent') {
+	if (@$_REQUEST['task'] == 'formContent') {
 		echo get_option('formContent');
 		die();
-	} else if ($_REQUEST['task'] == 'ebook_store_form_input') {
+	} else if (@$_REQUEST['task'] == 'ebook_store_form_input') {
 		ebook_store_save_form($_POST['md5_nonce'],$_POST);
 	}
 }
@@ -1463,4 +1536,44 @@ function ebook_store_get_mailchimp_subscribe($email) {
 	$dcurl = "https://" . substr($api_key, strpos($api_key, '-')+1) . ".api.mailchimp.com/2.0/lists/subscribe.json?apikey=" . $api_key . "&id=" . get_option('mailchimp_lists') . "&email[email]=" . $email;
 	//error_log($dcurl);
 	return file_get_contents($dcurl);
+}
+function ebook_wp_embed_ebook() {
+	wp_enqueue_script( 'ebook_store_settings', plugins_url( '/js/ebook_store_settings.js' , __FILE__ ), array(), '1.0.0', true );
+	?>
+	<div class="ebook_store_embed_all_items" style=" display:inline-block; clear:both; max-height:200px; overflow-x:auto; width:100%;">
+	<?php
+	$new = new WP_Query('post_type=ebook');
+	while ($new->have_posts()) : $new->the_post();
+	$img_cover = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment_cover', true);
+	$ebook = get_post_meta(get_the_ID(), 'ebook', true);
+	$c = new Currencies();
+	$price = $c->getSymbol(get_option('paypal_currency','USD')) . number_format((float)$ebook['ebook_price'],2)
+		?>
+		<div class="ebook_store_embed_ebook_item" style="width:100%; clear:both;">
+			<?php
+			if (@$img_cover['url'] != '') {
+			?><img src="<?php echo $img_cover['url']; ?>" onClick="ebook_store_embed_code(<?php echo get_the_ID(); ?>);" style="background:gray; width:45px; height:65px; float: left; margin:10px;" />
+			<?php
+			} else {
+				?>
+					<div style="background:gray; width:45px; height:65px; float: left; margin:10px;" onClick="ebook_store_embed_code(<?php echo get_the_ID(); ?>);"></div>
+				<?php
+			}
+
+			?><span class="ebook_store_embed_ebook_item_title" style="margin-top: 11px;display: inline-block;">
+				<a href="javascript:void(0);" onClick="ebook_store_embed_code(<?php echo get_the_ID(); ?>);" title="Click to embed this ebook in the post"><b><?php echo get_the_title() ?></b></a>
+				<a href="post.php?post=<?php echo get_the_ID(); ?>&action=edit" title="Click to edit this ebook in a new window." target="_blank"><small>[Edit]</small></a>
+				<br /><input id="ebook_code" onClick="this.select()" readonly type="text" size="29" value='[ebook_store ebook_id="<?php echo get_the_ID(); ?>"]' />
+
+			</span>
+			<p>
+				Price: <?php echo $price; ?> Download type: <?php echo $ebook['donate_or_download']; ?>
+				
+			</p>
+		</div>
+		<?php
+	endwhile;	
+	?>
+	</div>
+	<?php
 }
