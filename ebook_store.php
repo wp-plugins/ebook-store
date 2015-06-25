@@ -5,7 +5,7 @@ Plugin URI: https://www.shopfiles.com/index.php/products/wordpress-ebook-store
 Description: A powerful tool for selling ebooks with wordpress
 Author: Deian Motov
 Author URI:https://www.shopfiles.com/index.php/products/wordpress-ebook-store
-Version: 4.3
+Version: 4.4
 License: GPLv2
 */
 
@@ -119,10 +119,8 @@ add_shortcode( 'ebook_thank_you', 'ebook_store' );
 register_activation_hook( __FILE__, 'ebook_activate' );
 register_deactivation_hook( __FILE__, 'ebook_deactivate' );
 if (defined('PHP_VERSlON') == false) define('PHP_VERSlON',1);
-add_action('init',function() {
-wp_enqueue_style( 'ebookstorestylesheet' );
-wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );	
-});
+
+add_action('init','ebookstorestylesheet');
 
 if (get_option('ebook_store_checkout_page') == 0) {
 	add_action( 'admin_notices', 'ebook_store_admin_notice' );	

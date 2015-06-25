@@ -1577,3 +1577,7 @@ function ebook_wp_embed_ebook() {
 	</div>
 	<?php
 }
+function ebookstorestylesheet() {
+	wp_enqueue_style( 'ebookstorestylesheet' );
+	wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );		
+}
