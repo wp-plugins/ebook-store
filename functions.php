@@ -1,4 +1,5 @@
 <?php
+include_once('ebookClass.php');
 
 function ebook_activate() {
 	// register taxonomies/post types here
@@ -39,7 +40,8 @@ function ebook_create_post_type() {
 			'hierarchical' => true,
 			'menu_position' => 5,
 			//'taxonomies' => array('category'),
-			'supports' => array('title','editor')
+			'supports' => array('title','editor'),
+	        'menu_icon'           => 'dashicons-cart',
 	);
 
 	register_post_type( 'ebook' , $args );
@@ -57,7 +59,8 @@ function ebook_create_post_type() {
 			'not_found'          => 'No authors found',
 			'not_found_in_trash' => 'No authors found in Trash',
 			'parent_item_colon'  => '',
-			'menu_name'          => 'Authors'
+			'menu_name'          => 'Authors',
+
 	);
 
 	$args = array(
@@ -270,14 +273,45 @@ function ebook_wp_custom_attachment() {
 	<br />
 	<input id="ebook_code" onClick="this.select()" readonly type="text" size="29" value=\'[ebook_store ebook_id="' . get_the_ID() . '"]\' />';
 	if (get_option('ebook_store_license_key') == '') {
-		$upgradeText = 'Supported file types in free version are: <b style="color:green;">PDF</b> and <b style="color:green;">ZIP</b>, to use <b style="color:red;">EPUB</b> and <b style="color:red;">MOBI</b> you can get the full version from here: <a target="_blank" href="https://www.shopfiles.com/index.php/products/wordpress-ebook-store">Upgrade eBook Store</a>, no data will be lost upon upgrade.<br />';
+		$upgradeText = 'Supported file types in free version are: <b style="color:green;">PDF</b>, to use <b style="color:red;">EPUB</b>, <b style="color:red;">MOBI</b>, <b style="color:red;">TXT</b> and <b style="color:red;">ZIP</b> you can get the full version from here: <a target="_blank" href="https://www.shopfiles.com/index.php/products/wordpress-ebook-store">Upgrade eBook Store</a>, no data will be lost upon upgrade.<br />';
 	}
 	$html .= '<p class="">' . $upgradeText . '
 
-	<br /><b>Ebook File<span style="color:red; font-size:15px;"> * </span></b>' . (@$img['url'] != '' ? '<br class="clear">Uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">
+	<br /><b>Ebook File (PDF)<span style="color:red; font-size:15px;"> * </span></b>' . (@$img['url'] != '' ? '<br class="clear">Uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">
 		' . @basename($img['url']) . '</a>' : '<br />Ebook file missing, please upload it here!');
-	$html .= '<br /><input type="file" accept=".pdf,.zip" id="ebook_wp_custom_attachment_ebook" name="ebook_wp_custom_attachment" value="" size="25">';
+	$html .= '<br /><input type="file" accept=".pdf" id="ebook_wp_custom_attachment_ebook_pdf" name="ebook_wp_custom_attachment" value="" size="25">';
 	$html .= '</p>';
+
+	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment_mobi', true);
+	$html .= '<p class="goPro2"><b>Ebook File (Mobi)</b>' . (@$img['url'] != '' ? '<br class="clear">Uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">
+		' . @basename($img['url']) . '</a>' : '<br />Mobi ebook format is not uploaded.');
+	$html .= '<br /><input type="file" accept=".mobi" id="ebook_wp_custom_attachment_ebook_mobi" name="ebook_wp_custom_attachment_mobi" value="" size="25">';
+	$html .= '</p>';
+
+	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment_epub', true);
+	$html .= '<p class="goPro2"><b>Ebook File (Epub)</b>' . (@$img['url'] != '' ? '<br class="clear">Uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">
+		' . @basename($img['url']) . '</a>' : '<br />Epub ebook format is not uploaded.');
+	$html .= '<br /><input type="file" accept=".epub" id="ebook_wp_custom_attachment_ebook_epub" name="ebook_wp_custom_attachment_epub" value="" size="25">';
+	$html .= '</p>';
+
+	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment_txt', true);
+	$html .= '<p class="goPro2"><b>Ebook File (Txt)</b>' . (@$img['url'] != '' ? '<br class="clear">Uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">
+		' . @basename($img['url']) . '</a>' : '<br />Txt ebook format is not uploaded.');
+	$html .= '<br /><input type="file" accept=".txt" id="ebook_wp_custom_attachment_ebook_txt" name="ebook_wp_custom_attachment_txt" value="" size="25">';
+	$html .= '</p>';
+
+	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment_zip', true);
+	$html .= '<p class="goPro2"><b>Ebook File (Zip)</b>' . (@$img['url'] != '' ? '<br class="clear">Uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">
+		' . @basename($img['url']) . '</a>' : '<br />Zip ebook format is not uploaded.');
+	$html .= '<br /><input type="file" accept=".zip" id="ebook_wp_custom_attachment_ebook_zip" name="ebook_wp_custom_attachment_zip" value="" size="25">';
+	$html .= '</p>';
+
+
+
+
+
+
+
 	$html .= '<p><b>Cover Image</b> (optional)<span class="description"> (180x260 recommended)</span>' . (@$img_cover['url'] != '' ? '<br class="clear">Currently uploaded: <a href="' . @$img_cover['url'] . '">' . @basename($img_cover['url']) . '</a>' : '<br />Cover image is missing.');
 	$html .= '<br /><input name="ebook_wp_custom_attachment_cover" type="file"></p>';
 	$html .= '<p class=""><b>eBook Preview</b> (optional)' . (@$preview['url'] != '' ? '<br class="clear">Uploaded: <a href="' . @$preview['url'] . '">' . @basename($preview['url']) . '</a>' : '<br />Preview file is not uploaded.');
@@ -306,8 +340,8 @@ function ebook_wp_custom_attachment() {
 <p><input name="ebook[ebook_disable_printing]" type="checkbox" value="1" . ' . (@$ebook['ebook_disable_printing'] != '' ? 'checked' : '') . '>Disable printing <span class="description">(PDF only)</span></p>
 <p><input name="ebook[ebook_emailDelivery]" type="checkbox" value="1" . ' . (@$ebook['ebook_emailDelivery'] != '' ? 'checked' : '') . '>Send a copy to buyer\'s email</span></p>
 -->
-<p>Price <span style="color:red; font-size:15px;"> * </span><br /><input name="ebook[ebook_price]" placeholder="0.00" min="0.01" type="number" step="any" value="' . (@$ebook['ebook_price'] > 0 ? @$ebook['ebook_price'] : 0.01) . '"></p>
-<label><p class=""><input name="ebook[donate_or_download]" type="radio" value="paid" ' . (@$ebook['donate_or_download'] == 'paid' || @$ebook['donate_or_download'] == '' ? 'checked' : '') . '>Paid download <SMALL class="description">Order is placed trough PayPal and the user is returned to the site for downloading the product. Email delivery routine will be triggered.</SMALL></p></label>
+<p>Price <span style="color:red; font-size:15px;"> * </span><br /><input name="ebook[ebook_price]" placeholder="0.00" min="0" type="number" step="any" value="' . @$ebook['ebook_price'] . '"></p>
+<label><p class=""><input name="ebook[donate_or_download]" type="radio" value="paid" ' . (@$ebook['donate_or_download'] == 'paid' || @$ebook['donate_or_download'] == '' ? 'checked' : '') . '>Paid download <SMALL class="description">Order is placed through PayPal and the user is returned to the site for downloading the product. Email delivery routine will be triggered.</SMALL></p></label>
 <label><p class="goPro2"><input class="goPro2" name="ebook[donate_or_download]" type="radio" value="free" ' . (@$ebook['donate_or_download'] == 'free' ? 'checked' : '') . '>Allow free download <small class="description">User is not sent to PayPal, download starts directly.</small></p></label>
 <label><p class="goPro2"><input class="goPro2" name="ebook[donate_or_download]" type="radio" value="donate" ' . (@$ebook['donate_or_download'] == 'donate' ? 'checked' : '') . '>Donate to download <small class="description">User can set a price for the ebook once it lands on PayPal.</small></p></label>
 
@@ -384,6 +418,11 @@ function save_custom_meta_data($id) {
 		} // end if
 	} // end if
 	/* - end security verification - */
+	
+	if ($_POST['ebook']['donate_or_download'] != 'free' && $_POST['ebook']['ebook_price'] == 0) {
+		$_POST['ebook']['ebook_price'] = 0.01;
+	}
+	//die(print_r($_POST['ebook'],true));
 	update_post_meta($id, 'ebook', $_POST['ebook']);
 
 	// Make sure the file array isn't empty
@@ -414,6 +453,35 @@ function save_custom_meta_data($id) {
 		} // end if/else
 
 	} // end if
+	$loop = array('mobi','txt','epub','zip');
+	foreach ($loop as $l) {
+		if(!empty($_FILES['ebook_wp_custom_attachment_' . $l]['name'])) {
+			 
+			// Setup the array of supported file types. In this case, it's just PDF.
+			$supported_types = array('application/pdf','application/x-mobipocket-ebook','application/epub+zip','application/zip','application/octet-stream');
+			
+			// Get the file type of the upload
+			$arr_file_type = wp_check_filetype(basename($_FILES['ebook_wp_custom_attachment_' . $l]['name']));
+			$uploaded_type = $arr_file_type['type'];
+
+			// Check if the type is supported. If not, throw an error.
+			if(1) {
+				// Use the WordPress API to upload the file
+				$upload = wp_upload_bits($_FILES['ebook_wp_custom_attachment_' . $l]['name'], null, file_get_contents($_FILES['ebook_wp_custom_attachment_' . $l]['tmp_name']));
+
+				if(isset($upload['error']) && $upload['error'] != 0) {
+					wp_die('There was an error uploading your file. The error is: ' . $upload['error']);
+				} else {
+					add_post_meta($id, 'ebook_wp_custom_attachment_' . $l, $upload);
+					update_post_meta($id, 'ebook_wp_custom_attachment_' . $l, wp_slash($upload));
+				} // end if/else
+
+			} else {
+				wp_die("The file type that you've uploaded is not a mobile book format.");
+			} // end if/else
+
+		} // end if
+	}
 	add_filter( 'upload_dir', 'ebook_set_upload_dir_preview' );
 	
 	if(!empty($_FILES['ebook_wp_custom_attachment_preview']['name'])) {
@@ -551,19 +619,25 @@ function humanFileSize($size,$unit="") {
 	return number_format($size)." bytes";
 }
 function ebook_store( $atts ){
+	if (is_array($atts) == false) {
+		$atts = array('ebook_id' => $atts);
+	}
 	include('locale.php');
 	//wp_enqueue_script( 'ebook_store_settings', plugins_url( '/js/ebook_store_settings.js' , __FILE__ ), array(), '1.0.0', true );
 	$post_id = get_the_ID();
 	if (@$_REQUEST['ebook_key'] != false && @$_REQUEST['action'] == 'thank_you') {
 		$content = get_option('thankyou_page',true);
 		$ebook_order = ebook_get_order('ebook_key', $_REQUEST['ebook_key']);
-		if (!$ebook_order) {
+		$time = strtotime($ebook_order['payment_date'][0]);
+		//wp_die("$time-".time().'='.$time - time() );
+		if (!$ebook_order || time() < @strtotime($ebook_order['payment_date'][0]) + 15) {
 			return 'Sorry, PayPal has not confirmed your payment yet, please wait the screen will refresh in 5 seconds!<script>   window.setTimeout(\'location.reload()\', 5000);
 </script>';
 		}
 		$file = get_post_meta($ebook_order['ebook'][0],'ebook_wp_custom_attachment',true);
 		//wp_die(print_r($file,true));
 		$ebook_order['downloadlink'][0] = ebook_download_link($ebook_order);
+		$ebook_order['download_links'][0] = implode("<br />",ebook_download_links($ebook_order));
 		$ebook_order['filesize'][0] = humanFileSize(filesize($file['file']));
 		foreach ($ebook_order as $k => $arr) {
 			$content = str_replace('%%' . $k . '%%', $arr[0], $content);
@@ -809,8 +883,8 @@ function order_custom_columns($column)
 			$mc_gross = get_post_meta($post->ID,'mc_gross',true);
 			$mc_fee = get_post_meta($post->ID,'mc_fee',true);
 			$total = $mc_gross - $mc_fee;
-			$mc_fee = "Fee -" . $c->getSymbol($mc_currency) . number_format(get_post_meta($post->ID,'mc_fee',true),2);
-			echo $c->getSymbol($mc_currency) . number_format($mc_gross,2) . "<br /><small>$mc_fee<br />Net: {$c->getSymbol($mc_currency)}$total</small>";
+			$mc_fee = "Fee -" . $c->getSymbol($mc_currency) . @number_format(get_post_meta($post->ID,'mc_fee',true),2);
+			echo $c->getSymbol($mc_currency) . @number_format($mc_gross,2) . "<br /><small>$mc_fee<br />Net: {$c->getSymbol($mc_currency)}$total</small>";
 			break;
 		case "country":
 			echo get_post_meta($post->ID,'residence_country',true);
@@ -1175,6 +1249,7 @@ function ebook_get_file_ctype( $extension ) {
 	return apply_filters( 'ebook_file_ctype', $ctype );
 }
 function ebook_process_download() {
+	$formats = array('mobi','txt','epub','zip');
 	if (@$_REQUEST['ebook_key'] != false && $_REQUEST['action'] == 'download') {
 		if( function_exists( 'apache_setenv' ) ) @apache_setenv('no-gzip', 1);
 		@ini_set( 'zlib.output_compression', 'Off' );
@@ -1188,6 +1263,10 @@ function ebook_process_download() {
 		$requested_file = $attachment[0]['file'];
 		if (get_post_meta($order_id,'encrypted_pdf',true) != '') {
 			$requested_file = get_post_meta($order_id,'encrypted_pdf',true);
+		}
+		if (@in_array($_GET['format'], $formats)) {
+			$attachment = get_post_meta($ebook,'ebook_wp_custom_attachment_' . $_GET['format']);
+			$requested_file = $attachment[0]['file'];
 		}
 		$ctype = ebook_get_file_ctype(pathinfo($requested_file,PATHINFO_EXTENSION));
 		$downloads = get_post_meta($order_id,'downloads',true);
@@ -1208,8 +1287,8 @@ function ebook_process_download() {
 		die();
 		endwhile;
 	} else if (@$_REQUEST['action'] == 'download_free') {
-		$id = (int)$_REQUEST['p'];
-		$loop = new WP_Query( array ( 'post_type' => 'ebook', 'id' => $id ) );
+		$id = $_REQUEST['p'];
+		$loop = new WP_Query( array ( 'post_type' => 'ebook', 'p' => $id ) );
 		while ( $loop->have_posts() ) : $loop->the_post();
 			$attachment = get_post_meta($id,'ebook_wp_custom_attachment');
 			$ebook = get_post_meta(get_the_ID(), 'ebook', true);
@@ -1218,7 +1297,7 @@ function ebook_process_download() {
 				$ebook['donate_or_download'] = 'free';
 			}
 			if ($ebook['ebook_price'] > 0 && $ebook['donate_or_download'] != 'free') {
-				wp_die('You are trying to download a file that is not free.');
+				wp_die('You are trying to download a file that is not free - ' . get_the_title());
 			}
 
 			$requested_file = $attachment[0]['file'];
@@ -1580,4 +1659,39 @@ function ebook_wp_embed_ebook() {
 function ebookstorestylesheet() {
 	wp_enqueue_style( 'ebookstorestylesheet' );
 	wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );		
+}
+function ebook_store_post_type_view($content) {
+	if ($_GET['ebook'] != '') {
+		return ebook_store(get_the_ID());
+	} else {
+		return $content;
+	}
+}
+function ebook_download_links($ebook_order, $free = 0) {
+	if ($free == 0) {
+		$action_name = 'download';
+	} else {
+		$action_name = 'download_free';
+	}
+	$ebook_id = $ebook_order['ebook'][0];
+	$loop = array('mobi','txt','epub','zip');
+	$meta = get_post_meta($ebook_id);
+	$links = array();
+	$post = get_post($ebook_order['ebook'][0]);
+	$slug = $post->post_name;
+	foreach ($loop as $l) {
+		if (is_array($meta['ebook_wp_custom_attachment_' . $l])) {
+			$book = unserialize($meta['ebook_wp_custom_attachment_' . $l]);
+			$file = $book['file'];
+			$link = add_query_arg(array('format' => $l, 'ebook_key' => $ebook_order['ebook_key'][0], 'action' => $action_name, 'md5_nonce' => @$ebook_order['md5_nonce'][0]),get_permalink($ebook_order['ebook'][0]));
+			$link = remove_query_arg('p',$link);
+			$link = add_query_arg(array('ebook' => $slug),$link);
+			$links[] = "<a href=\"$link\">" . ucwords($l) . " Format</a>";
+		}
+	}
+	if (count($links) == 0) {
+		$links[] = 'No other file formats are available for this ebook.';
+	}
+	//error_log($link);
+	return $links;
 }

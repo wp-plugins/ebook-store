@@ -29,11 +29,17 @@ function ebook_store_no_license() {
 	});
 	jQuery('.goPro, .goPro2').css({background: '#FFB0B0', opacity: 1});
 	jQuery('input[type=radio].goPro2').remove();
+	jQuery('.goPro2 input[type=file]').attr('disabled','disabled');
 }
 function ebook_store_embed_code(ebook_id) {
 	//tinyMCE.activeEditor.setContent(tinyMCE.activeEditor.getContent() + '[ebook_store ebook_id="' + ebook_id + '"]', {format : 'raw'});
 	// alert('Success! eBook embed code is added to the bottom of the article, you can move it if needed.');
-	tinyMCE.activeEditor.execCommand('mceInsertContent', false, '[ebook_store ebook_id="' + ebook_id + '"]');
+	if (tinyMCE.activeEditor != null) {
+		tinyMCE.activeEditor.execCommand('mceInsertContent', false, '[ebook_store ebook_id="' + ebook_id + '"]');
+		jQuery('#content').val(jQuery('#content').val() + '[ebook_store ebook_id="' + ebook_id + '"]');
+	} else {
+		jQuery('#content').val(jQuery('#content').val() + '[ebook_store ebook_id="' + ebook_id + '"]');
+	}
 	var body = jQuery("html, body");
 	body.animate({scrollTop:0}, '500', 'swing', function() { 
 	   

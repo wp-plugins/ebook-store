@@ -2,10 +2,10 @@
 /*
 Plugin Name: eBook store
 Plugin URI: https://www.shopfiles.com/index.php/products/wordpress-ebook-store
-Description: A powerful tool for selling ebooks with wordpress
+Description: &#10003; eBook Store is a unique and powerful tool for selling ebooks with wordpress, allowing you to display beautiful buy now forms for your ebook(s) and givig you the ability to offer encrypted, watermarked and QR code stamped ebooks to your buyers, a proven way to prevent piracy.
 Author: Deian Motov
 Author URI:https://www.shopfiles.com/index.php/products/wordpress-ebook-store
-Version: 4.5
+Version: 4.9
 License: GPLv2
 */
 
@@ -106,15 +106,19 @@ function check_ipn() {
 }
 add_action( 'init', 'ebook_create_post_type' );
 add_action( 'init', 'ebook_process_download', 100 );
+
 add_action("manage_posts_custom_column", "order_custom_columns");
 add_action('add_meta_boxes', 'ebook_add_custom_meta_boxes');  
 add_action('post_edit_form_tag', 'ebook_update_edit_form'); 
 add_action('save_post', 'save_custom_meta_data'); 
 add_action('save_post', 'save_custom_meta_data_order');
+//add_action('init','ebook_store_post_type_view');
+add_filter( 'the_content', 'ebook_store_post_type_view' );
 add_filter( 'enter_title_here', 'custom_enter_title_author' );
 add_filter( 'enter_title_here', 'custom_enter_title_publisher' );
 add_filter("manage_edit-ebook_order_columns", "order_columns");
 add_shortcode( 'ebook_store', 'ebook_store' );
+
 add_shortcode( 'ebook_thank_you', 'ebook_store' );
 register_activation_hook( __FILE__, 'ebook_activate' );
 register_deactivation_hook( __FILE__, 'ebook_deactivate' );
@@ -131,8 +135,8 @@ if (get_option('paypal_account') == '') {
 
 //3.3
 add_filter('post_updated_messages', 'ebook_store_set_messages' );
-add_filter( 'get_sample_permalink_html', 'ebook_store_remove_parmelink' );
-add_filter( 'pre_get_shortlink', 'ebook_store_pre_get_shortlink', 10, 2 );
+//add_filter( 'get_sample_permalink_html', 'ebook_store_remove_parmelink' );
+//add_filter( 'pre_get_shortlink', 'ebook_store_pre_get_shortlink', 10, 2 );
 
 add_action( 'admin_head-post-new.php', 'ebook_admin_css' );
 add_action( 'admin_head-post.php', 'ebook_admin_css' );
