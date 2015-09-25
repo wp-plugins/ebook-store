@@ -5,7 +5,7 @@ Plugin URI: https://www.shopfiles.com/index.php/products/wordpress-ebook-store
 Description: &#10003; eBook Store is a unique and powerful tool for selling ebooks with WordPress, allowing you to display beautiful buy now forms for your ebook(s) and givig you the ability to offer encrypted, watermarked and QR code stamped ebooks to your buyers, a proven way to prevent piracy. With the built in MailChimp integration you can directly subscribe your clients to a mailing list.
 Author: Deian Motov
 Author URI:https://www.shopfiles.com/index.php/products/wordpress-ebook-store
-Version: 4.91
+Version: 4.92
 License: GPLv2
 */
 
@@ -59,7 +59,7 @@ function check_ipn() {
 			//error_log("$md5 $custom[1] " . NONCE_KEY . $custom[0] . $mc_gross);
 			if ($md5 == $custom[1] || $ebook['donate_or_download'] == 'donate') {
 				
-				$post_id = wp_insert_post( $my_post, $wp_error );
+				$post_id = @wp_insert_post( $my_post, $wp_error );
 				foreach ($_REQUEST as $k => $v) {
 					update_post_meta($post_id, $k, $v);
 					@$order[$k] = $v;

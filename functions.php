@@ -275,6 +275,9 @@ function ebook_wp_custom_attachment() {
 	if (get_option('ebook_store_license_key') == '') {
 		$upgradeText = 'Supported file types in free version are: <b style="color:green;">PDF</b>, to use <b style="color:red;">EPUB</b>, <b style="color:red;">MOBI</b>, <b style="color:red;">TXT</b> and <b style="color:red;">ZIP</b> you can get the full version from here: <a target="_blank" href="https://www.shopfiles.com/index.php/products/wordpress-ebook-store">Upgrade eBook Store</a>, no data will be lost upon upgrade.<br />';
 	}
+	if (@$img['url'] == '') {
+		$html .= '<h5>Do you need help converting ebooks to all possible formats? Try <a target="_blank" href="http://calibre-ebook.com/download">Calibre</a>, a free software for converting ebook files.</h5>';
+	}
 	$html .= '<p class="">' . $upgradeText . '
 
 	<br /><b>Ebook File (PDF)<span style="color:red; font-size:15px;"> * </span></b>' . (@$img['url'] != '' ? '<br class="clear">Uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">
@@ -1510,6 +1513,7 @@ function ebook_store_set_columns( $columns ) {
 		//'genre' => __( 'Genre' ),
 		'date' => __( 'Date' ),
 		'price' => __( 'Price' ),
+		'sales' => __( 'Sales' ),
 		'embed_code' => __('Embed Code for posts and pages')
 	);
 
@@ -1525,6 +1529,13 @@ function ebook_store_columns_output( $column, $post_id ) {
 		
 		case 'embed_code':
 		echo '[ebook_store ebook_id="' . $post_id . '"]';
+		break;
+		case 'sales':
+		$c = new Currencies();
+		$total = $c->getSymbol(get_option('paypal_currency','USD')) . number_format(ebook_store_stats($post_id, 0),2);
+		$week = $c->getSymbol(get_option('paypal_currency','USD')) . number_format(ebook_store_stats($post_id, 7),2);
+		$month = $c->getSymbol(get_option('paypal_currency','USD')) . number_format(ebook_store_stats($post_id, 30.4),2);
+		echo "Total: $total<br />7 Days: $week<br />30 Days: $month";
 		break;
 		case 'price':
 		$ebook = get_post_meta(get_the_ID(), 'ebook', true);
@@ -1680,8 +1691,8 @@ function ebook_download_links($ebook_order, $free = 0) {
 	$post = get_post($ebook_order['ebook'][0]);
 	$slug = $post->post_name;
 	foreach ($loop as $l) {
-		if (is_array($meta['ebook_wp_custom_attachment_' . $l])) {
-			$book = unserialize($meta['ebook_wp_custom_attachment_' . $l]);
+		if (@is_array($meta['ebook_wp_custom_attachment_' . $l])) {
+			$book = unserialize($meta['ebook_wp_custom_attachment_' . $l][0]);
 			$file = $book['file'];
 			$link = add_query_arg(array('format' => $l, 'ebook_key' => $ebook_order['ebook_key'][0], 'action' => $action_name, 'md5_nonce' => @$ebook_order['md5_nonce'][0]),get_permalink($ebook_order['ebook'][0]));
 			$link = remove_query_arg('p',$link);
@@ -1694,4 +1705,46 @@ function ebook_download_links($ebook_order, $free = 0) {
 	}
 	//error_log($link);
 	return $links;
+}
+function ebook_store_stats($ebook_id, $days) {
+	$seconds = 86400 * $days;
+	if ($seconds == 0) {
+		$seconds = 157680000;
+	}
+	$args = array(
+		'post_type' => 'ebook_order',
+		'meta_query' => array(
+			array(
+			'key' => 'ebook',
+			'value' => $ebook_id,
+			)
+		),
+		'date_query' => array(
+		array(
+			'column' => 'post_date_gmt',
+			'after'  => $seconds . ' seconds ago',
+		),
+	));
+	// The Query
+	$the_query = new WP_Query( $args );
+	$out = 0;
+	// The Loop
+	if ( $the_query->have_posts() ) {
+//		echo '<ul>';
+		while ( $the_query->have_posts() ) {
+			$the_query->the_post();
+			$id = get_the_ID();
+			//echo "$id<br/>";
+			$meta = get_post_meta($id);
+			//print_r($meta);
+			$out += $meta['mc_gross'][0];
+//			echo '<li>' . get_the_title() . '</li>';
+		}
+//		echo '</ul>';
+	} else {
+		// no posts found
+	}
+	/* Restore original Post Data */
+	wp_reset_postdata();
+	return $out;
 }
