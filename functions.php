@@ -36,7 +36,7 @@ function ebook_create_post_type() {
 			'show_in_nav_menus' => true,
 			'query_var' => true,
 			'rewrite' => array('slug','ebook'),
-			'capability_type' => 'post',
+			'capability_type' => 'page',
 			'hierarchical' => true,
 			'menu_position' => 5,
 			//'taxonomies' => array('category'),
@@ -1661,7 +1661,7 @@ function ebookstorestylesheet() {
 	wp_register_style( 'ebookstorestylesheet', plugins_url('css/ebook_store.css', __FILE__) );		
 }
 function ebook_store_post_type_view($content) {
-	if ($_GET['ebook'] != '') {
+	if (get_post_type() == 'ebook') {
 		return ebook_store(get_the_ID());
 	} else {
 		return $content;
