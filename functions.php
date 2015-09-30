@@ -749,7 +749,7 @@ function ebook_store( $atts ){
                                     <li>' . get_the_content() . '</li>
                                     <li>' . $publishers . '</li>
                                     <li>' . ($ebook['ebook_date'] > 0 ? date("F j, Y",strtotime($ebook['ebook_date'])) : '') . '</li>
-                                    <li>' . ($ebook['ebook_pages'] > 0 ? $ebook['ebook_pages'] . ' pages' : '') . '</li>
+                                    <li>' . ($ebook['ebook_pages'] > 0 ? $ebook['ebook_pages'] . ' ' . $locale['pages'] : '') . '</li>
                                 </ul>
                             <span class="close-details"></span></div>
             </figure>
@@ -848,7 +848,7 @@ class Currencies {
 
 		}
 
-		return (string) $this->currencies[$code]['symbol'];
+		return (string) @$this->currencies[$code]['symbol'];
 
 	}
 
