@@ -38,7 +38,7 @@ function ebook_create_post_type() {
 			'rewrite' => array('slug','ebook'),
 			'capability_type' => 'page',
 			'hierarchical' => true,
-			'menu_position' => 5,
+			//'menu_position' => 5,
 			//'taxonomies' => array('category'),
 			'supports' => array('title','editor'),
 	        'menu_icon'           => 'dashicons-cart',
@@ -74,7 +74,7 @@ function ebook_create_post_type() {
 			'capability_type'    => 'post',
 			'has_archive'        => true,
 			'hierarchical'       => false,
-			'menu_position'      => 5,
+			//'menu_position'      => 5,
 			'supports'           => array( 'title', 'thumbnail','comments' )
 	);
 
@@ -107,7 +107,7 @@ function ebook_create_post_type() {
 			'capability_type'    => 'post',
 			'has_archive'        => true,
 			'hierarchical'       => false,
-			'menu_position'      => 5,
+			//'menu_position'      => 5,
 			'supports'           => array( 'title', 'thumbnail','comments' )
 	);
 
@@ -140,7 +140,7 @@ function ebook_create_post_type() {
 			'capability_type'    => 'post',
 			'has_archive'        => true,
 			'hierarchical'       => false,
-			'menu_position'      => 5,
+			//'menu_position'      => 5,
 			'supports'           => array('title','excerpt')
 	);
 
