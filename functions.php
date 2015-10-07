@@ -282,7 +282,7 @@ function ebook_wp_custom_attachment() {
 
 	<br /><b>Ebook File (PDF)<span style="color:red; font-size:15px;"> * </span></b>' . (@$img['url'] != '' ? '<br class="clear">Uploaded: <a href="javascript:alert(\'File is protected and impossible to access by using direct path, this is to avoid downloads without payment.\');">
 		' . @basename($img['url']) . '</a>' : '<br />Ebook file missing, please upload it here!');
-	$html .= '<br /><input type="file" accept=".pdf" id="ebook_wp_custom_attachment_ebook_pdf" name="ebook_wp_custom_attachment" value="" size="25">';
+	$html .= '<br /><input type="file" accept=".pdf,.m4b,.mp3" id="ebook_wp_custom_attachment_ebook_pdf" name="ebook_wp_custom_attachment" value="" size="25">';
 	$html .= '</p>';
 
 	$img = get_post_meta(get_the_ID(), 'ebook_wp_custom_attachment_mobi', true);
