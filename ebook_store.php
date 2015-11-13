@@ -5,7 +5,7 @@ Plugin URI: https://www.shopfiles.com/index.php/products/wordpress-ebook-store
 Description: &#10003; eBook Store is a unique and powerful tool for selling ebooks with WordPress, allowing you to display beautiful buy now forms for your ebook(s) and giving you the ability to offer encrypted, watermarked and QR code stamped ebooks to your buyers, a proven way to prevent piracy. With the built-in MailChimp integration you can directly subscribe your clients to a mailing list.
 Author: Deian Motov
 Author URI:https://www.shopfiles.com/index.php/products/wordpress-ebook-store
-Version: 4.98
+Version: 5.0
 License: GPLv2
 */
 
@@ -80,14 +80,14 @@ function check_ipn() {
 				update_post_meta($post_id,'ebook',$custom[0]);
 				
 				global $attachment;
-				$attachment = ebook_attachment($custom[0]);
+				$attachment = ebook_attachment($custom[0],true); //important!!!
 				$ebook_email_delivery = array('to' => $_REQUEST['payer_email'], 'subject' => get_option('email_delivery_subject'), 'text' => get_option('email_delivery_text'),'attachment' => $attachment, 'order' => $order);
 				//mail(get_option( 'admin_email' ), 'eBook store for WordPress - Verified Order Received', print_r($ebook_email_delivery,true));
 				//wp_mail($_REQUEST['payer_email'],get_option('email_delivery_subject'),'Email delivery text');
 				$fileExt = pathinfo($attachment[0]['file'],PATHINFO_EXTENSION);
-				if ($fileExt == 'pdf' && get_option('encrypt_pdf')) {
+				if ($fileExt == 'pdf' && get_option('encrypt_pdf')) { //$fileExt == 'pdf' && get_option('encrypt_pdf')
 					add_action( 'init', 'ebook_encrypt_pdf', 99 );
-					//error_log('ecnrypt pdf added to init');
+					// error_log('ecnrypt pdf added to init');
 				}
 				
 				add_action( 'init', 'ebook_email_delivery', 100);
@@ -142,5 +142,7 @@ add_action( 'admin_head-post.php', 'ebook_admin_css' );
 add_filter( 'manage_edit-ebook_columns', 'ebook_store_set_columns' ) ;
 add_action( 'manage_ebook_posts_custom_column', 'ebook_store_columns_output', 10, 2 );
 add_filter('upload_mimes', 'ebook_mime_types', 1, 1);
+add_action('admin_menu', 'ebook_store_register_my_custom_submenu_page');
+
 
 ?>
