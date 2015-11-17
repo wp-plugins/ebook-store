@@ -53,6 +53,7 @@ function register_ebook_store_settings() {
     register_setting( 'ebook-settings-group', 'disable_pdf_printing' );
     register_setting( 'ebook-settings-group', 'mailchimp_api_key' );
     register_setting( 'ebook-settings-group', 'mailchimp_lists' );
+    register_setting( 'ebook-settings-group', 'kindleDelivery' );
 }
 
 
@@ -360,6 +361,11 @@ wp_dropdown_pages($args);
         <th scope="row">Fill a form upon order
         </th>
         <td><input type="checkbox" name="formEnabled"  value="1" <?php echo (get_option('formEnabled') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">If this feature is enabled the user will be asked to fill in a form with more details, the form you can edit as you wish with your own html editor and paste the code on this page's section with the form content.</span></td>
+        </tr>
+        <tr valign="top" class="goPro">
+        <th scope="row">Require @kindle.com email for delivery
+        </th>
+        <td><input type="checkbox" name="kindleDelivery"  value="1" <?php echo (get_option('kindleDelivery') != 0 ? 'checked="checked"' : ''); ?> /><span class="description">You can use that with combination of "Fill a form feature" to get the kindle email of the user (use field name "kindle_email").</span></td>
         </tr>
 
         <tr valign="top" class="goPro">

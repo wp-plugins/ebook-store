@@ -3,7 +3,7 @@ Contributors: motov.net
 Tags: paypal, epub, paid downloads, sell, files, ebook, ebooks, paid, downloads, qr code, sell ebook, pdf drm, watermark, ecnrypt, pdf, mobi, sell ebooks, donate, free, mailchimp
 Requires at least: 3.5.1
 Tested up to: 4.3.1
-Stable tag: 5.0
+Stable tag: 5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,9 @@ The plugin can disable printing, apply watermark with buyer's information on eac
 2. The details view, comes with a nice 3d effect that works trough all modern browsers.
 
 == Changelog ==
+
+= 5.1 =
+* Kind email requirement feature added.
 
 = 5.0 =
 * PRO Version encryption fix when attach files feature was off.

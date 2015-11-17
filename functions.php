@@ -722,7 +722,7 @@ function ebook_store( $atts ){
             <figure>
                             <div class="perspective"><div class="book" data-book="book-' . get_the_ID() . '"><div class="cover"><div data-dd="dd" class="front" style="background: url(' . @$cover['url'] . ');"></div><div class="inner inner-left"></div></div><div class="inner inner-right"></div></div></div><div class="buttons">
                             		<a href="#" style="display:none;">Look inside</a><a href="#" class="details_link">' . $locale['details'] . '</a><a target="_blank" href="' . (@$preview['url'] != '' ? $preview['url'] : '" style="display:none;') . '" class="">' . $locale['preview'] . '</a>
-<a class="ebook_buy_link" data-md5_nonce="' . $md5_nonce . '" href="' . $buyNowLinkOnClickOriginal . '" onClick="' . $buyNowLinkOnClick . '">' . $buyNowLinkText . '</a>
+<a class="ebook_buy_link" data-md5_nonce="' . $md5_nonce . '" href="' . @$buyNowLinkOnClickOriginal . '" onClick="' . $buyNowLinkOnClick . '">' . $buyNowLinkText . '</a>
 <form method="post" id="' . $md5rand . '" name="dmp_order_form" action="https://www' . (get_option('paypal_sandbox') != '' ? '.sandbox' : '') . '.paypal.com/cgi-bin/webscr">
 		<input type="hidden" name="rm" value="0">
 		<input type="hidden" name="discount_rate" value="0">
@@ -1389,18 +1389,31 @@ function ebook_get_order($key = 'ebook_key',$val) {
 }
 
 function ebook_email_delivery($post_id) {
-	global $ebook_email_delivery;
+	global $ebook_email_delivery, $formData;
+	$formData = (array)json_decode($formData);
+	// error_log('formData ' . print_r($formData,true));
+
 	foreach ($ebook_email_delivery['order'] as $k => $v) {
 		$ebook_email_delivery['text'] = str_replace('%%' . $k . '%%', $v, $ebook_email_delivery['text']);
 	}
 	$ebook_email_delivery['text'] = apply_filters('the_content',$ebook_email_delivery['text']);
 	$attachmentFile = $ebook_email_delivery['attachment'][0]['file'];
-	if (get_option('attach_files') != 'on') {
+	if (get_option('attach_files') != 1) {
 		$attachmentFile = null;
 	}
 	add_filter( 'wp_mail_content_type', 'ebook_set_content_type' );
 	if (get_option('email_delivery') == 1) {
 		//echo "Sending mail, data: " . implode("; ", $ebook_email_delivery);
+		if (get_option('kindleDelivery') == 1) {
+			if (strpos($formData['kindle_email'], '@kindle.com')) {
+			// if (1) {
+				$formData['kindle_email'] = filter_var($formData['kindle_email'], FILTER_VALIDATE_EMAIL);
+				$ebook_email_delivery['to'] = $formData['kindle_email'];
+			} else {
+				return true; //not a kind
+			}
+		}
+		error_log("Emailing - " . $ebook_email_delivery['to']);
 		wp_mail($ebook_email_delivery['to'],$ebook_email_delivery['subject'], $ebook_email_delivery['text'],null,$attachmentFile);
 	}
 }
@@ -1409,7 +1422,9 @@ function ebook_set_content_type( $content_type ){
 }
 function ebook_attachment($post_id, $ignoreSetting = false) {
 	if (get_option('attach_files') == 1 || $ignoreSetting == true) {
-		return get_post_meta($post_id,'ebook_wp_custom_attachment');
+		$attachment = get_post_meta($post_id,'ebook_wp_custom_attachment');
+		if (WP_DEBUG == true) error_log('attachment - ' . print_r($attachment,true));
+		return $attachment;
 	}
 }
 function ebook_encrypt_pdf($r = null) {
