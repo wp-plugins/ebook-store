@@ -1257,7 +1257,9 @@ function ebook_get_file_ctype( $extension ) {
 	return apply_filters( 'ebook_file_ctype', $ctype );
 }
 function ebook_process_download() {
-	//error_reporting(0);
+	@ini_set('display_errors',0);
+	@error_reporting(0);
+
 	$formats = array('mobi','txt','epub','zip');
 	if (@$_REQUEST['ebook_key'] != false && $_REQUEST['action'] == 'download') {
 		if( function_exists( 'apache_setenv' ) ) @apache_setenv('no-gzip', 1);
@@ -1308,7 +1310,13 @@ function ebook_process_download() {
 			if ($ebook['ebook_price'] > 0 && $ebook['donate_or_download'] != 'free') {
 				wp_die('You are trying to download a file that is not free - ' . get_the_title());
 			}
+			$status = get_post_status();
+			erl($status);
 
+			if ($status != 'publish') {
+				wp_die('You are trying to download a file that is not available.');
+			}
+			
 			$requested_file = $attachment[0]['file'];
 
 			$ctype = ebook_get_file_ctype(pathinfo($requested_file,PATHINFO_EXTENSION));
@@ -1428,6 +1436,8 @@ function ebook_attachment($post_id, $ignoreSetting = false) {
 	}
 }
 function ebook_encrypt_pdf($r = null) {
+	@ini_set('display_errors',0);
+	@error_reporting(0);
 	if ($r == false) {
 		$r = $_REQUEST;
 	}
@@ -1509,7 +1519,7 @@ function ebook_encrypt_pdf($r = null) {
 	$pdf->SetProtection((array)$protection, $password, $owner_password);
 	
 	$pdf->Output($destfile, 'F');
-	update_post_meta($ebook_email_delivery['order']['order_id'],'encrypted_pdf',wp_slash($destfile));
+	update_post_meta(@$ebook_email_delivery['order']['order_id'],'encrypted_pdf',wp_slash($destfile));
 	//make sure enc file is attached
 	$ebook_email_delivery['attachment'][0]['file'] = $destfile;
 	$isPdf = true;
