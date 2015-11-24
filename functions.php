@@ -473,7 +473,7 @@ function save_custom_meta_data($id) {
 			// Check if the type is supported. If not, throw an error.
 			if(1) {
 				// Use the WordPress API to upload the file
-				$upload = wp_upload_bits($_FILES['ebook_wp_custom_attachment_' . $l]['name'], null, file_get_contents($_FILES['ebook_wp_custom_attachment_' . $l]['tmp_name']));
+				$upload = wp_upload_bits($_FILES['ebook_wp_custom_attachment_' . $l]['name'], null, @file_get_contents($_FILES['ebook_wp_custom_attachment_' . $l]['tmp_name']));
 
 				if(isset($upload['error']) && $upload['error'] != 0) {
 					wp_die('There was an error uploading your file. The error is: ' . $upload['error']);

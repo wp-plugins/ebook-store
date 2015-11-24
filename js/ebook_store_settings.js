@@ -3,11 +3,11 @@ jQuery(function() {
 		if (ebook_store_license_key != '') {
 			jQuery.getJSON('https://www.shopfiles.com/api/wordpress_license.php?product=ebook_store&key=' + ebook_store_license_key,function(data) {
 				if (data.found == 1) {
-					console.log(data);
+					//console.log(data);
 					jQuery('.goPro').last().remove();
 					jQuery('.goPro').last().remove();
 					//accept=".pdf,.zip"
-					jQuery('#ebook_wp_custom_attachment_ebook').attr('accept','.pdf,.zip,.mobi,.epub,.txt');
+					jQuery('#ebook_wp_custom_attachment_ebook_pdf').attr('accept','.pdf,.zip,.mobi,.epub,.txt,.m4b,.mp3');
 				} else {
 					alert(data.error);
 					ebook_store_no_license();
